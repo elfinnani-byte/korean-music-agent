@@ -306,8 +306,9 @@ def run_retrieval(g, seeds: list[str], required_rels: list[list[str]], cfg: dict
     if max_triples_override is not None:
         local_cfg["retrieval"]["max_triples"] = max_triples_override
 
+    initial_gap_rels = [r for group in required_rels for r in group]
     state = {"triples": [], "trace": [], "frontier": list(seeds),
-             "visited": [], "seeds": list(seeds), "gap_rels": []}
+             "visited": [], "seeds": list(seeds), "gap_rels": initial_gap_rels}
     max_radius = local_cfg["retrieval"]["max_radius"]
     radius = 1
     while True:

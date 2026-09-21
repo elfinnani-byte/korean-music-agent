@@ -63,6 +63,40 @@ def test_run_retrieval_none_hub_threshold_override_actually_disables_hub_blockin
     assert uncapped["gap_rels"] == [], "차단을 껐으면 허브를 지나 FOUNDED 를 찾아야 한다"
 
 
+def test_run_retrieval_boosts_required_relation_on_first_hop():
+    """실측 버그: gap_rels 는 expand_one_hop() 이 끝난 *뒤에* triples 로부터
+       계산되는데, 1홉째는 그 계산이 아직 한 번도 안 돈 시점이라
+       state['gap_rels'] 가 빈 리스트로 시작한다. edge_score() 의 필수
+       관계 우선순위(1.3배)는 이 gap_rels 멤버십으로 판정하므로, 정확히
+       씨앗에서 뻗어나가는 1홉째에서는 필수 관계도 가산점을 못 받고
+       degree_penalty 가 큰(차수 높은) 꼬리 노드로 가는 필수 간선이
+       per_node_out 컷오프 밖으로 밀려날 수 있다(실측: 지드래곤->빅뱅
+       MEMBER_OF, 빅뱅 차수 87). required_rels 를 첫 홉 전에 gap_rels 로
+       미리 심어 둬야 한다."""
+    g = nx.MultiDiGraph()
+    g.add_node("artist:seed", name="seed", type="Artist", norm="seed")
+    g.add_node("song:d1", name="d1", type="Song", norm="d1")
+    g.add_node("song:d2", name="d2", type="Song", norm="d2")
+    g.add_node("award:req", name="req", type="Award", norm="req")
+    g.add_node("artist:other1", name="other1", type="Artist", norm="other1")
+    g.add_node("artist:other2", name="other2", type="Artist", norm="other2")
+    g.add_node("artist:other3", name="other3", type="Artist", norm="other3")
+    g.add_node("artist:other4", name="other4", type="Artist", norm="other4")
+    # d1, d2 는 차수 2(경쟁 간선 없이 흔한 관계), req 는 차수 3(필수 관계지만
+    # 허브 감점을 더 받는 꼬리 노드) 이 되도록 곁가지 간선을 하나씩 더 단다.
+    g.add_edge("artist:seed", "song:d1", relation="PERFORMED", origins=["llm"], agreement=1.0)
+    g.add_edge("artist:other1", "song:d1", relation="PERFORMED", origins=["llm"], agreement=1.0)
+    g.add_edge("artist:seed", "song:d2", relation="PERFORMED", origins=["llm"], agreement=1.0)
+    g.add_edge("artist:other2", "song:d2", relation="PERFORMED", origins=["llm"], agreement=1.0)
+    g.add_edge("artist:seed", "award:req", relation="WON", origins=["llm"], agreement=1.0)
+    g.add_edge("artist:other3", "award:req", relation="WON", origins=["llm"], agreement=1.0)
+    g.add_edge("artist:other4", "award:req", relation="WON", origins=["llm"], agreement=1.0)
+
+    cfg = {**CFG, "retrieval": {**CFG["retrieval"], "per_node_out": 2, "hub_degree_threshold": 25}}
+    out = agent.run_retrieval(g, seeds=["artist:seed"], required_rels=[["WON"]], cfg=cfg)
+    assert out["gap_rels"] == [], "필수 관계(WON)가 1홉째 가산점을 받아 per_node_out 컷오프 안에 들어야 한다"
+
+
 def test_run_retrieval_gives_up_at_max_radius_with_gap_reported():
     """고립 노드 하나만 두면 첫 홉에서 프런티어가 곧장 비어 버려
        '프런티어 소진'과 '반경 소진'을 구분하지 못한다. 체인을 3홉 이상
