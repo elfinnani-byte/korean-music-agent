@@ -195,15 +195,23 @@ def edge_score(g, tail_id: str, edge: dict, state: dict, cfg: dict) -> float:
     return base * edge["agreement"] * pen * prio
 
 
+def _is_quota_exempt(rel: str, origins: list[str], cfg: dict) -> bool:
+    """교량 관계(WROTE 등)나 규칙 기원은 예산 상한에서 면제한다 — 흔한
+       관계(SIGNED_TO 등)에 밀려 사라지면 안 된다. expand_one_hop() 의
+       per_node_out 절단과 _select_within_budget() 의 per_relation 절단
+       양쪽에서 같은 기준을 써야 한다(실측 버그: per_node_out 이 이 기준을
+       몰라 규칙 기원 저점수 간선까지 점수만으로 잘라내고 있었다)."""
+    exempt_rels = set(cfg["retrieval"]["quota_exempt_relations"])
+    exempt_origins = set(cfg["retrieval"]["quota_exempt_origins"])
+    return rel in exempt_rels or any(o in exempt_origins for o in origins)
+
+
 def _select_within_budget(candidates: list[tuple], cfg: dict) -> list[tuple]:
     """candidates: (score, direction, head_id, tail_id, rel, edge_data) 리스트.
        점수 내림차순으로 관계별 상한(per_relation)과 전체 상한(max_triples)을
-       적용한다. 교량 관계와 규칙 기원은 관계별 상한에서 면제한다 — 흔한
-       관계(SIGNED_TO 등)에 밀려 사라지면 안 된다."""
+       적용한다. 교량 관계와 규칙 기원은 관계별 상한에서 면제한다."""
     per_relation = cfg["retrieval"]["per_relation"]
     max_triples = cfg["retrieval"]["max_triples"]
-    exempt_rels = set(cfg["retrieval"]["quota_exempt_relations"])
-    exempt_origins = set(cfg["retrieval"]["quota_exempt_origins"])
 
     ordered = sorted(candidates, key=lambda c: -c[0])
     rel_count: dict[str, int] = {}
@@ -211,8 +219,7 @@ def _select_within_budget(candidates: list[tuple], cfg: dict) -> list[tuple]:
     for score, direction, h, t, rel, data in ordered:
         if len(selected) >= max_triples:
             break
-        origins = data.get("origins", [])
-        exempt = rel in exempt_rels or any(o in exempt_origins for o in origins)
+        exempt = _is_quota_exempt(rel, data.get("origins", []), cfg)
         if not exempt and rel_count.get(rel, 0) >= per_relation:
             continue
         rel_count[rel] = rel_count.get(rel, 0) + 1
@@ -251,7 +258,13 @@ def expand_one_hop(g, state: dict, cfg: dict) -> dict:
             e = {"origins": data["origins"], "agreement": data["agreement"], "relation": data["relation"]}
             node_candidates.append((edge_score(g, nid, e, state, cfg), "in", u, nid, data["relation"], data))
         node_candidates.sort(key=lambda c: -c[0])
-        candidates.extend(node_candidates[:per_node_out])
+        # per_relation 상한 면제(교량 관계·규칙 기원)는 여기서도 지켜야 한다.
+        # 안 그러면 점수만으로 자르는 이 단계에서 먼저 잘려 나가, 뒤의
+        # _select_within_budget() 이 면제해 줄 기회조차 없다(실측 버그).
+        is_exempt = [_is_quota_exempt(c[4], c[5].get("origins", []), cfg) for c in node_candidates]
+        exempt = [c for c, ex in zip(node_candidates, is_exempt) if ex]
+        non_exempt = [c for c, ex in zip(node_candidates, is_exempt) if not ex]
+        candidates.extend(exempt + non_exempt[:per_node_out])
 
     selected = _select_within_budget(candidates, cfg)
 

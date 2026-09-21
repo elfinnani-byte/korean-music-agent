@@ -94,6 +94,32 @@ def test_expand_per_node_out_keeps_highest_scored_edges_not_first_in_graph_order
     assert "MEMBER_OF" in rels, "삽입 순서상 9번째라고 점수도 못 매겨 보고 잘리면 안 된다"
 
 
+def test_expand_per_node_out_does_not_drop_quota_exempt_candidates():
+    """실측 버그: per_node_out 절단이 quota_exempt_origins/relations 를
+       전혀 모른 채 점수만으로 상위 N개를 자른다. _select_within_budget()
+       의 면제 로직은 이미 여기서 잘려 나간 후보에는 적용될 기회조차
+       없다 - '규칙 기원이라 상한 면제'라는 설계가 이 단계에서는
+       지켜지지 않는다. 골든셋 Q22("빅뱅은 몇 년대에 데뷔한 그룹인가?")
+       재평가에서, 규칙 기원 WON 간선들이 많아 DEBUTED_IN(비면제, 저점수)
+       이 per_node_out 에 잘리면서 실제로 이 패턴이 재현됐다."""
+    g = nx.MultiDiGraph()
+    g.add_node("artist:a", name="a", type="Artist", norm="a")
+    g.add_node("era:target", name="target", type="Era", norm="target")
+    # 비면제(origin=llm) 고득점 후보 5개가 per_node_out=3 안을 채운다
+    for i in range(5):
+        g.add_node(f"song:{i}", name=str(i), type="Song", norm=str(i))
+        g.add_edge("artist:a", f"song:{i}", relation="PERFORMED", origins=["llm"], agreement=1.0)
+    # 면제(origin=rule) 후보 1개는 점수가 가장 낮아 순위로는 꼴찌다
+    g.add_edge("artist:a", "era:target", relation="DEBUTED_IN", origins=["rule"], agreement=0.3)
+
+    cfg = {**CFG, "retrieval": {**CFG["retrieval"], "per_node_out": 3}}
+    state = {"frontier": ["artist:a"], "visited": ["artist:a"], "seeds": ["artist:a"],
+             "triples": [], "trace": [], "gap_rels": [], "radius": 1}
+    out = agent.expand_one_hop(g, state, cfg)
+    rels = {t["rel"] for t in out["trace"]}
+    assert "DEBUTED_IN" in rels, "규칙 기원(면제 대상)은 per_node_out 절단에서도 살아남아야 한다"
+
+
 def test_expand_respects_per_relation_cap_but_exempts_bridge_relations():
     """PERFORMED 간선은 origins=['llm']로 둔다 — ['rule']을 쓰면
        quota_exempt_origins 자체에 걸려 상한이 면제되므로(규칙 기원은
