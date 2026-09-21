@@ -311,3 +311,14 @@ def insufficient_answer(gap_rels: list[str]) -> str:
        토큰도 아끼고 환각도 원천 차단한다(코드층 방어)."""
     rels = ", ".join(gap_rels) if gap_rels else "알 수 없음"
     return f"근거가 부족합니다. 이 자료만으로는 확인할 수 없습니다.\n(미확보 관계: {rels})"
+
+
+def synthesize(question: str, context: str, sources: list[str], llm) -> tuple[str, str, bool]:
+    """근거 전용 프롬프트로 답한다(프롬프트층 방어). 반환: (답변, decision, llm_answer_called).
+       코드층 게이트를 통과한 뒤에만 호출되므로 llm_answer_called 는 언제나 True다."""
+    prompt = (f"{schema.ANSWER_SYSTEM_PROMPT}\n\n"
+              f"[근거 삼중항]\n{context}\n\n[질문]\n{question}")
+    resp = llm.invoke(prompt)
+    text = resp.content
+    decision = "abstain" if "근거가 부족합니다" in text else "answer"
+    return text, decision, True
