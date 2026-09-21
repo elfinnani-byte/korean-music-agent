@@ -109,7 +109,7 @@
     "profiles": {
       "extract": {"provider": "openai", "model": "gpt-4.1-mini", "temperature": 0.0},
       "answer": {"provider": "openai", "model": "gpt-4.1", "temperature": 0.0},
-      "judge": {"provider": "google", "model": "gemini-3.8-flash", "temperature": 0.0}
+      "judge": {"provider": "openai", "model": "gpt-4.1-mini", "temperature": 0.0}
     },
     "env_keys": {"openai": "OPENAI_API_KEY", "google": "GOOGLE_API_KEY"},
     "request_timeout_sec": 90,
