@@ -31,14 +31,14 @@ streamlit run app.py
 실제 질의(라우팅 폴백·답변 생성)에만 키가 필요하다.
 
 fork/clone 뒤 새 가상환경에서 위 순서 그대로 실행해 확인했다(`pip install` →
-`pytest` 192개 통과 → `app.py` import 정상 — 아래 "실행 확인" 참고).
+`pytest` 193개 통과 → `app.py` import 정상 — 아래 "실행 확인" 참고).
 
 ## 처음부터 다시 빌드하려면
 
 ```bash
 python collect_docs.py      # 위키 문서 수집 (data/docs/*.md)
 python build_graph.py       # 그래프 구축 (output/graph.json, build_stats.json)
-python -m pytest            # 전체 테스트 (192개)
+python -m pytest            # 전체 테스트 (193개)
 ```
 
 `evaluate.py`의 함수들(`evaluate_item`, `sweep`, `hop_summary_table` 등)로
@@ -62,7 +62,7 @@ freeze_holdout.py           홀드아웃 동결 지문 계산·검증
 app.py                       Streamlit 챗봇 데모
 data/                          문서(docs/*.md), 골든셋, 매니페스트
 output/                        그래프, 빌드/평가 결과, 실행 로그(runs.jsonl)
-tests/                         pytest 테스트 192개
+tests/                         pytest 테스트 193개
 ```
 
 ---
@@ -77,7 +77,7 @@ tests/                         pytest 테스트 192개
 - 실행 결과: `output/runs.jsonl`(모든 질의 실행 로그), `output/eval.json` /
   `output/eval_holdout.json`(평가 결과), `screenshots/`(데모 캡처 2장)
 - 직접 실행 확인: fork 없이 새 clone + 새 venv에서 `pip install -r
-  requirements.txt` → `pytest`(192 passed) → `python -c "import app"`(키 없이도
+  requirements.txt` → `pytest`(193 passed) → `python -c "import app"`(키 없이도
   임포트 성공)까지 이 세션에서 직접 재현해 확인했다.
 - 막힐 수 있는 지점: `.env` 없이 사이드바에서 실제 질의를 누르면
   `RuntimeError`로 어떤 키가 없는지 명시한다(추측성 크래시가 아니다).
@@ -103,11 +103,13 @@ tests/                         pytest 테스트 192개
   색인→탐색→생성), 골든셋 25문항(`data/goldenset.json`, 튜닝 15 + 홀드아웃 10).
 - 전/후 비교: (1) P7 파라미터 스윕 — `hub_degree_threshold=None`이 `=25`보다
   평균 재현율 0.326 대 0.295로 약간 높음(`output/sweep.json`, 108칸). (2) 튜닝
-  대 홀드아웃 — 0.667 대 0.800(REPORT.md 9절). **한계를 정직하게 적는다**:
-  실행 중 발견한 버그 5개(아래 5절)의 개별 전/후 성능 재평가는 아직 하지
-  않았다 — 재평가에는 추가 LLM 비용이 들어, 코드 수정과 근거(그래프 재확인)만
-  기록하고 15문항 전체 재채점은 보류했다(`output/failure_notes.md` 참고).
-  숫자로 된 전/후 비교가 필요하면 이 지점이 다음 작업이다.
+  대 홀드아웃 — 0.733 대 0.800(REPORT.md 9절). (3) 버그 수정 전/후 — 튜닝
+  15문항을 실제로 재평가해 평균 0.667 → 0.733으로 올랐다(REPORT.md 9절
+  "재평가: 전/후 비교"). **개선과 회귀를 함께 적는다**: 문항별로 뜯어보면
+  진짜 개선 1건(Q22, 버그 수정으로 할루시네이션 없이 정답)과 진짜 회귀
+  1건(Q02, 새로 드러난 한계)이 섞여 있고, 나머지 변동 다수는 코드 동작이
+  아니라 `judge_repeats=1`의 채점 변동성이다 — 평균 숫자 하나만 보지 않고
+  이 구분을 REPORT.md·`judging_rules.md`에 그대로 남겼다.
 
 ### 4. 견고성
 
@@ -134,9 +136,11 @@ tests/                         pytest 테스트 192개
   `fix: config_hash 자기참조 모순 수정 + 홀드아웃 동결 재기록` — 각 커밋
   메시지에 "무엇을 어떻게 실측했고 왜 고쳤는지"가 들어 있다.
 - 고친 부분 추적: `git log --oneline`으로 전체 흐름을 볼 수 있고,
-  `output/failure_notes.md`는 실행 중 발견한 버그 5개(경로 재현율 계산,
-  예산 절단 순서, "소속" 중의성, 1홉째 가산점 누락, 동결 지문 자기참조)를
-  각각 원인·근거·수정 여부까지 서술했다.
+  `output/failure_notes.md`는 실행 중 발견한 버그 7개(경로 재현율 계산,
+  예산 절단 순서, "소속" 중의성, 1홉째 가산점 누락, 동결 지문 자기참조,
+  LLM 타임아웃/재시도 미연결, 예산 면제 기준 누락)를 각각 원인·근거·수정
+  여부까지 서술했고, 고치지 않고 한계로 남긴 것(`relation_gap()`의
+  "하나만 찾아도 충분" 판정)도 숨기지 않았다.
 
 ## 한계
 
@@ -145,5 +149,8 @@ tests/                         pytest 테스트 192개
   `output/failure_notes.md`를 참고한다.
 - 데모 사이드바에서 탐색 파라미터(반경·예산 등)를 조정할 수 있지만, 홀드아웃
   평가는 `config.json`에 동결된 값 하나로만 1회 실행했다.
-- 3절에서 언급한 대로, 버그 수정 5건 중 일부는 코드 수정·부분 검증까지만
-  했고 골든셋 15문항 전체 재평가(추가 비용 발생)는 아직 하지 않았다.
+- `relation_gap()`이 필요한 관계가 "어딘가에 하나라도 있으면" 충족으로
+  판정한다 — `answer_type: set`처럼 정답이 여러 개인 질문(예: 그룹
+  멤버 목록)에서 하나만 찾고도 탐색이 조기 종료될 수 있다. 재평가 중
+  새로 발견했고, gap 판정 로직 자체를 바꿔야 하는 더 큰 작업이라
+  v2 과제로 남겼다(REPORT.md 9절, `output/failure_notes.md` Q02).
