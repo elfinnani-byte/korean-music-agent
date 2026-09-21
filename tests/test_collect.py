@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import collect_docs as cd
 
 
@@ -36,3 +38,31 @@ def test_quota_fills_each_era_before_overflow():
     cands = [("a", "2020s"), ("b", "2020s"), ("c", "2020s"), ("d", "1990s")]
     picked = cd.apply_era_quota(cands, per_era_min=1, target=3)
     assert "d" in picked, "쿼터가 없으면 문서가 많은 최근 연대로 쏠린다"
+
+
+def test_quota_tops_up_from_existing_counts_instead_of_from_zero():
+    """시드 문서가 이미 어떤 연대를 채웠다면, 그 연대에서 또 per_era_min 만큼
+       새로 뽑을 필요가 없다. 남는 자리는 아직 못 채운 연대로 가야 한다.
+       target 을 빡빡하게 둬서 오버플로우 단계가 결과를 가리지 않게 한다."""
+    cands = [("a", "1990s"), ("c", "2020s")]
+    picked = cd.apply_era_quota(cands, per_era_min=1, target=1,
+                                existing_counts={"1990s": 1})
+    assert picked == ["c"], (
+        "1990s 는 시드가 이미 1건 채웠으므로 그 몫을 2020s 로 넘겨야 한다"
+    )
+
+
+def test_save_doc_sanitizes_windows_invalid_characters(tmp_path):
+    """콜론이 Windows NTFS 대체 데이터 스트림 구문과 충돌해 파일이 잘린다.
+       'Feel gHood Muzik : The 8th Wonder' 로 실제로 겪은 문제다."""
+    cd.save_doc(tmp_path, "Feel gHood Muzik : The 8th Wonder", ["힙합"], "본문")
+    files = list(tmp_path.glob("*.md"))
+    assert len(files) == 1
+    assert files[0].stat().st_size > 0
+    for bad in '<>:"/\\|?*':
+        assert bad not in files[0].name
+
+
+def test_save_doc_still_replaces_space_and_slash():
+    name = cd.safe_filename("아이유/2010s 활동")
+    assert " " not in name and "/" not in name

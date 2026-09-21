@@ -56,16 +56,22 @@ def rank_candidates(links_by_seed: dict[str, list[str]]) -> list[tuple[str, int]
 
 
 def apply_era_quota(candidates: list[tuple[str, str]], per_era_min: int,
-                    target: int) -> list[str]:
+                    target: int, existing_counts: dict[str, int] | None = None) -> list[str]:
     """연대 쿼터를 먼저 채운 뒤 남는 자리를 순위대로 채운다.
-       쿼터가 없으면 문서가 많은 2010~20년대로 쏠려 1990년대가 빈다."""
+       쿼터가 없으면 문서가 많은 2010~20년대로 쏠려 1990년대가 빈다.
+
+       existing_counts 는 시드 문서가 이미 채운 연대별 건수다. 이미 채운
+       연대에서 또 per_era_min 만큼 새로 뽑으면 target 이 그만큼 낭비되고,
+       정작 부족한 다른 연대로 갈 몫이 줄어든다."""
+    existing_counts = existing_counts or {}
     picked: list[str] = []
     by_era: dict[str, list[str]] = {}
     for title, era in candidates:
         by_era.setdefault(era, []).append(title)
 
     for era in schema.QUOTA_ERAS:
-        picked += by_era.get(era, [])[:per_era_min]
+        need = max(per_era_min - existing_counts.get(era, 0), 0)
+        picked += by_era.get(era, [])[:need]
     for title, _ in candidates:
         if len(picked) >= target:
             break
@@ -74,9 +80,19 @@ def apply_era_quota(candidates: list[tuple[str, str]], per_era_min: int,
     return picked[:target]
 
 
+WINDOWS_INVALID_CHARS = re.compile(r'[<>:"/\\|?*]')
+
+
+def safe_filename(title: str) -> str:
+    """Windows NTFS 에서 파일명으로 못 쓰는 문자를 전부 치환한다.
+       콜론은 특히 위험하다 — 대체 데이터 스트림 구문으로 해석돼
+       'Feel gHood Muzik : The 8th Wonder' 가 콜론 앞부분만 남고 잘렸다."""
+    return WINDOWS_INVALID_CHARS.sub("_", title.replace(" ", "_"))
+
+
 def save_doc(out_dir: Path, title: str, cats: list[str], body: str) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
-    fname = title.replace(" ", "_").replace("/", "_") + ".md"
+    fname = safe_filename(title) + ".md"
     text = f"# {title}\n\n분류: {', '.join(cats)}\n\n{body}\n"
     (out_dir / fname).write_text(text, encoding="utf-8")
 
@@ -89,6 +105,7 @@ def main() -> None:
                         max_attempts=cc["retry"]["max_attempts"],
                         backoff_base=cc["retry"]["backoff_base_sec"],
                         user_agent=cc["user_agent"])
+    out_dir = Path(cfg["paths"]["docs_dir"])
 
     seeds: list[str] = []
     for raw in cc["seed_titles"]:
@@ -100,15 +117,37 @@ def main() -> None:
         seeds.append(resolved)
     print(f"시드 {len(seeds)}건 해소 완료")
 
+    # 시드는 2홉 순위와 무관하게 반드시 코퍼스에 포함한다. 시드를 링크로만
+    # 다루면 서로 링크하는 시드만 우연히 살아남고, 시상식·소속사처럼
+    # 세대 교량 역할을 하도록 고른 시드가 코퍼스에서 통째로 빠질 수 있다.
+    saved: list[dict] = []
+    saved_titles: set[str] = set()
+    dropped_short = 0
+    seed_cats_map = client.categories_bulk(seeds)
+    for title in seeds:
+        cats = seed_cats_map.get(title, [])
+        body = client.extract(title)
+        if len(body) < cc["min_body_chars"]:
+            dropped_short += 1
+            print(f"  [시드 본문 부족] {title} ({len(body)}자)")
+            continue
+        era = era_from_categories(cats)  # 시상식·소속사 등은 None 이어도 저장한다
+        save_doc(out_dir, title, cats, body)
+        saved_titles.add(title)
+        saved.append({"title": title, "era": era, "categories": cats,
+                      "chars": len(body), "source": "seed"})
+        print(f"  저장 {len(saved):>3}. {title} ({len(body)}자) [시드]")
+
     links_by_seed = {s: client.links(s, cc["link_limit_per_seed"]) for s in seeds}
     ranked = rank_candidates(links_by_seed)
-    multi = [t for t, n in ranked if n >= 2]
-    print(f"2홉 후보 {len(ranked)}건, 그중 2개 이상 시드가 가리킨 것 {len(multi)}건")
+    multi = [t for t, n in ranked if n >= 2 and t not in saved_titles]
+    print(f"2홉 후보 {len(ranked)}건, 그중 2개 이상 시드가 가리키고 "
+          f"시드가 아닌 것 {len(multi)}건")
 
     cats_map = client.categories_bulk(multi[:600])
     survivors: list[tuple[str, str]] = []
     for title, cats in cats_map.items():
-        if not is_music_doc(title, cats):
+        if title in saved_titles or not is_music_doc(title, cats):
             continue
         era = era_from_categories(cats)
         if era is None:
@@ -116,19 +155,22 @@ def main() -> None:
         survivors.append((title, era))
     print(f"분류 필터 통과 {len(survivors)}건")
 
-    chosen = apply_era_quota(survivors, cc["per_era_min"], cc["target_docs"])
+    remaining_target = max(cc["target_docs"] - len(saved), 0)
+    existing_era_counts = Counter(d["era"] for d in saved if d["era"])
+    chosen = apply_era_quota(survivors, cc["per_era_min"], remaining_target,
+                             existing_era_counts)
     era_of = dict(survivors)
 
-    out_dir = Path(cfg["paths"]["docs_dir"])
-    saved, dropped_short = [], 0
     for title in chosen:
         body = client.extract(title)
         if len(body) < cc["min_body_chars"]:
             dropped_short += 1
             continue
         save_doc(out_dir, title, cats_map.get(title, []), body)
+        saved_titles.add(title)
         saved.append({"title": title, "era": era_of.get(title),
-                      "categories": cats_map.get(title, []), "chars": len(body)})
+                      "categories": cats_map.get(title, []), "chars": len(body),
+                      "source": "2hop"})
         print(f"  저장 {len(saved):>3}. {title} ({len(body)}자)")
 
     stats = {
