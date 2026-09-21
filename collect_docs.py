@@ -24,6 +24,9 @@ BLACKLIST = [re.compile(p) for p in schema.CATEGORY_BLACKLIST]
 YEAR_DEBUT = re.compile(r"^(\d{4})년\s*데뷔")
 YEAR_FORMED = re.compile(r"^(\d{4})년\s*(?:결성|설립)")
 YEAR_ALBUM = re.compile(r"^(\d{4})년\s*(?:음반|노래|싱글)")
+# 솔로 아티스트는 'YYYY년 데뷔' 대신 'YYYY년대 가수' 를 갖는 경우가 많다
+# (예: 아이유·보아·신승훈). 정확한 데뷔 연도가 없을 때의 대안이다.
+DECADE_CATEGORY = re.compile(r"^(\d{4})년대\s*(?:가수|음악가|아이돌|그룹|밴드)$")
 
 
 def is_music_doc(title: str, cats: list[str]) -> bool:
@@ -35,9 +38,23 @@ def is_music_doc(title: str, cats: list[str]) -> bool:
 
 
 def era_from_categories(cats: list[str]) -> str | None:
-    """데뷔 연도를 우선하고 없으면 결성·발매 연도로 대신한다.
-       설계서 3.2 — 둘은 다른 사건이므로 어느 쪽을 썼는지 구분해 둔다."""
-    for pat in (YEAR_DEBUT, YEAR_FORMED, YEAR_ALBUM):
+    """데뷔 연도를 우선하고 없으면 연대 카테고리·결성·발매 연도로 대신한다.
+       설계서 3.2 — 데뷔와 결성은 다른 사건이므로 어느 쪽을 썼는지 구분해 둔다.
+
+       솔로 아티스트는 정확한 'YYYY년 데뷔'가 아니라 'YYYY년대 가수' 를
+       갖는 경우가 많다(아이유·보아·신승훈 실제 카테고리로 확인). 활동
+       기간이 여러 연대에 걸치면(신승훈: 1990s+2000s+2010s) 데뷔에 가까운
+       가장 이른 연대를 고른다 — 최근 연대를 고르면 세대 앵커 역할을 잃는다."""
+    for c in cats:
+        m = YEAR_DEBUT.match(c)
+        if m:
+            return schema.era_of_year(int(m.group(1)))
+
+    decade_years = [int(m.group(1)) for c in cats if (m := DECADE_CATEGORY.match(c))]
+    if decade_years:
+        return schema.era_of_year(min(decade_years))
+
+    for pat in (YEAR_FORMED, YEAR_ALBUM):
         for c in cats:
             m = pat.match(c)
             if m:

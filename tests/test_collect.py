@@ -27,6 +27,25 @@ def test_era_from_categories_returns_none_when_unknown():
     assert cd.era_from_categories(["대한민국의 가수"]) is None
 
 
+def test_era_from_categories_reads_decade_category_for_solo_artists():
+    """솔로 아티스트는 'YYYY년 데뷔' 대신 'YYYY년대 가수'를 갖는 경우가
+       많다. 아이유·보아·신승훈 실제 카테고리로 확인한 문제다."""
+    assert cd.era_from_categories(["1990년대 가수", "대한민국의 남자 가수"]) == "1990s"
+
+
+def test_era_from_categories_picks_earliest_decade_when_career_spans_many():
+    """신승훈처럼 1990s+2000s+2010s 가 모두 붙은 경우 데뷔에 가까운
+       가장 이른 연대를 골라야 한다. 최근 연대를 고르면 활동 시작이
+       사라져 세대 앵커 역할을 못 한다."""
+    cats = ["2010년대 가수", "1990년대 가수", "2000년대 가수"]
+    assert cd.era_from_categories(cats) == "1990s"
+
+
+def test_era_from_categories_prefers_exact_debut_over_decade_category():
+    cats = ["2008년 데뷔", "2000년대 가수", "2010년대 가수"]
+    assert cd.era_from_categories(cats) == "2000s"
+
+
 def test_rank_candidates_prefers_multi_seed_targets():
     links = {"시드A": ["X", "Y"], "시드B": ["Y", "Z"], "시드C": ["Y"]}
     ranked = cd.rank_candidates(links)
