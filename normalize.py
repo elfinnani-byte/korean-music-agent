@@ -41,3 +41,54 @@ def is_junk(name: str, ntype: str) -> bool:
     if BARE_YEAR.match(n) and schema.NODE_TYPES.get(ntype) == "attribute":
         return True
     return False
+
+
+RULE_VOTE_WEIGHT = 5
+CONTEXT_TYPES = {"Song", "Album"}
+TYPE_ORDER = {t: i for i, t in enumerate(schema.NODE_TYPES)}
+
+
+def vote_type(llm_votes: dict[str, int], rule_votes: dict[str, int]) -> str:
+    """분류 기반 규칙 투표에 가중치 5, LLM 투표에 1.
+       동점이면 엔티티 패밀리를 우선한다."""
+    score: dict[str, int] = {}
+    for t, n in llm_votes.items():
+        score[t] = score.get(t, 0) + n
+    for t, n in rule_votes.items():
+        score[t] = score.get(t, 0) + n * RULE_VOTE_WEIGHT
+    if not score:
+        raise ValueError("타입 투표가 비어 있다")
+    best = max(score.values())
+    tied = [t for t, v in score.items() if v == best]
+    entity = [t for t in tied if schema.NODE_TYPES.get(t) == "entity"]
+    pool = entity or tied
+    return sorted(pool, key=lambda t: TYPE_ORDER.get(t, 99))[0]
+
+
+def node_id(name: str, ntype: str, context: str | None) -> str:
+    """Song·Album 은 제목만으로 동일성이 서지 않는다(설계서 4.3).
+       맥락(대표 수행자 또는 수록 앨범)을 ID 에 넣어 동명이곡을 가른다."""
+    key = norm_key(name)
+    if ntype in CONTEXT_TYPES:
+        return f"{ntype.lower()}:{key}:{norm_key(context) if context else '_'}"
+    return f"{ntype.lower()}:{key}"
+
+
+def can_merge_songs(a: dict, b: dict) -> bool:
+    """제목이 같은 두 곡을 합쳐도 되는가.
+       제목은 필요조건일 뿐 충분조건이 아니다."""
+    if a["performers"] & b["performers"]:
+        return True
+    if a["albums"] & b["albums"]:
+        return True
+    if a["quotes"] & b["quotes"]:
+        return True
+    return False
+
+
+def canonical_symmetric(a: tuple[str, str], b: tuple[str, str]):
+    """대칭 관계의 정준 방향을 정한다. (이름, 타입) 두 쌍을 받는다.
+       타입을 먼저 보는 이유는 이름만으로 정렬하면 스키마에 없는
+       튜플이 나올 수 있기 때문이다."""
+    key = lambda x: (TYPE_ORDER.get(x[1], 99), norm_key(x[0]))
+    return tuple(sorted([a, b], key=key))
