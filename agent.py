@@ -174,3 +174,81 @@ def edge_score(g, tail_id: str, edge: dict, state: dict, cfg: dict) -> float:
     else:
         prio = 1.0
     return base * edge["agreement"] * pen * prio
+
+
+def _select_within_budget(candidates: list[tuple], cfg: dict) -> list[tuple]:
+    """candidates: (score, direction, head_id, tail_id, rel, edge_data) 리스트.
+       점수 내림차순으로 관계별 상한(per_relation)과 전체 상한(max_triples)을
+       적용한다. 교량 관계와 규칙 기원은 관계별 상한에서 면제한다 — 흔한
+       관계(SIGNED_TO 등)에 밀려 사라지면 안 된다."""
+    per_relation = cfg["retrieval"]["per_relation"]
+    max_triples = cfg["retrieval"]["max_triples"]
+    exempt_rels = set(cfg["retrieval"]["quota_exempt_relations"])
+    exempt_origins = set(cfg["retrieval"]["quota_exempt_origins"])
+
+    ordered = sorted(candidates, key=lambda c: -c[0])
+    rel_count: dict[str, int] = {}
+    selected = []
+    for score, direction, h, t, rel, data in ordered:
+        if len(selected) >= max_triples:
+            break
+        origins = data.get("origins", [])
+        exempt = rel in exempt_rels or any(o in exempt_origins for o in origins)
+        if not exempt and rel_count.get(rel, 0) >= per_relation:
+            continue
+        rel_count[rel] = rel_count.get(rel, 0) + 1
+        selected.append((score, direction, h, t, rel, data))
+    return selected
+
+
+def expand_one_hop(g, state: dict, cfg: dict) -> dict:
+    """프런티어에서 한 홉 확장한다. 순방향(out)·역방향(in) 간선을 모두 본다.
+       반환값은 state 에 병합할 부분 갱신(triples·trace·frontier·visited)이다.
+
+       visited 에 이번 홉의 프런티어 자신을 먼저 합쳐 둔다. 안 그러면 jyp 를
+       확장하다가 jyp 로 들어오는 간선(u -> jyp)을 볼 때 jyp 가 아직
+       visited 에 없어 new_frontier 에 자기 자신을 다시 넣는 버그가 생긴다
+       — 이미 확장을 마친 노드가 다음 홉에 다시 프런티어로 등장해 같은
+       간선을 반복 방문하게 된다."""
+    visited = set(state["visited"]) | set(state["frontier"])
+    seeds = set(state["seeds"])
+    threshold = cfg["retrieval"]["hub_degree_threshold"]
+    per_node_out = cfg["retrieval"]["per_node_out"]
+
+    candidates: list[tuple] = []
+    for nid in state["frontier"]:
+        if is_hub(g, nid, threshold) and nid not in seeds:
+            continue  # 허브는 시드가 아니면 확장 시작점으로 쓰지 않는다
+        out_edges = list(g.out_edges(nid, data=True))[:per_node_out]
+        for _, v, data in out_edges:
+            e = {"origins": data["origins"], "agreement": data["agreement"], "relation": data["relation"]}
+            candidates.append((edge_score(g, v, e, state, cfg), "out", nid, v, data["relation"], data))
+        in_edges = list(g.in_edges(nid, data=True))[:per_node_out]
+        for u, _, data in in_edges:
+            e = {"origins": data["origins"], "agreement": data["agreement"], "relation": data["relation"]}
+            candidates.append((edge_score(g, nid, e, state, cfg), "in", u, nid, data["relation"], data))
+
+    selected = _select_within_budget(candidates, cfg)
+
+    new_triples, new_trace, new_frontier = [], [], []
+    hop_no = state["radius"]
+    for score, direction, h, t, rel, data in selected:
+        h_name, t_name = g.nodes[h]["name"], g.nodes[t]["name"]
+        new_triples.append({"h": h_name, "r": rel, "t": t_name})
+        new_trace.append({"hop": hop_no, "head": h_name, "rel": rel, "tail": t_name,
+                          "dir": direction, "origin": "+".join(sorted(data["origins"])),
+                          "score": round(score, 4)})
+        for nid in (h, t):
+            if nid in visited or nid in new_frontier:
+                continue
+            ntype = g.nodes[nid]["type"]
+            if ntype in schema.NON_EXPANDING_TYPES:
+                continue  # Genre·Era 는 근거로만 쓰고 프런티어에 넣지 않는다
+            new_frontier.append(nid)
+
+    return {
+        "triples": state["triples"] + new_triples,
+        "trace": state["trace"] + new_trace,
+        "frontier": new_frontier,
+        "visited": sorted(visited),
+    }
