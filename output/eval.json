@@ -1,0 +1,440 @@
+{
+  "split": "tuned",
+  "items": [
+    {
+      "id": "Q01",
+      "hops": 1,
+      "era_cross": false,
+      "route_expected": "local",
+      "route_actual": "local",
+      "idx": {
+        "exact": 1.0,
+        "relaxed": 1.0,
+        "node": 1.0,
+        "none": 0.0
+      },
+      "triple_recall": 1.0,
+      "path_prefix_recall": 1.0,
+      "break_hop": null,
+      "matched_path_index": 0,
+      "decision": "answer",
+      "llm_answer_called": true,
+      "scores": [
+        0.0
+      ],
+      "score": 0.0,
+      "failure_layer": "generation",
+      "layer3": "생성",
+      "baseline": {
+        "answer": "답: SM 엔터테인먼트\n경로: 동방신기 -[소속]-> SM 엔터테인먼트\n근거: (\"동방신기\", \"소속\", \"SM 엔터테인먼트\")",
+        "score": 1.0
+      }
+    },
+    {
+      "id": "Q02",
+      "hops": 1,
+      "era_cross": false,
+      "route_expected": "local",
+      "route_actual": "local",
+      "idx": {
+        "exact": 1.0,
+        "relaxed": 1.0,
+        "node": 1.0,
+        "none": 0.0
+      },
+      "triple_recall": 1.0,
+      "path_prefix_recall": 1.0,
+      "break_hop": null,
+      "matched_path_index": 0,
+      "decision": "answer",
+      "llm_answer_called": true,
+      "scores": [
+        1.0
+      ],
+      "score": 1.0,
+      "failure_layer": "ok",
+      "layer3": "정상",
+      "baseline": {
+        "answer": "답: 서태지, 이주노, 양현석\n경로: 서태지와 아이들 -[구성원]-> 서태지, 이주노, 양현석\n근거: (\"서태지와 아이들\", \"구성원\", \"서태지\"), (\"서태지와 아이들\", \"구성원\", \"이주노\"), (\"서태지와 아이들\", \"구성원\", \"양현석\")",
+        "score": 1.0
+      }
+    },
+    {
+      "id": "Q03",
+      "hops": 1,
+      "era_cross": false,
+      "route_expected": "local",
+      "route_actual": "local",
+      "idx": {
+        "exact": 0.0,
+        "relaxed": 1.0,
+        "node": 1.0,
+        "none": 0.0
+      },
+      "triple_recall": 0.0,
+      "path_prefix_recall": 0.0,
+      "break_hop": 1,
+      "matched_path_index": 0,
+      "decision": "abstain",
+      "llm_answer_called": false,
+      "scores": [
+        0.0
+      ],
+      "score": 0.0,
+      "failure_layer": "index",
+      "layer3": "색인",
+      "baseline": {
+        "answer": "답: 신승훈이 작곡하였다.\n경로: 신승훈 -[작곡]-> 《미소 속에 비친 그대》\n근거: (\"신승훈\", \"작곡\", \"《미소 속에 비친 그대》\")",
+        "score": 1.0
+      }
+    },
+    {
+      "id": "Q05",
+      "hops": 2,
+      "era_cross": false,
+      "route_expected": "path",
+      "route_actual": "path",
+      "idx": {
+        "exact": 1.0,
+        "relaxed": 1.0,
+        "node": 1.0,
+        "none": 0.0
+      },
+      "triple_recall": 1.0,
+      "path_prefix_recall": 1.0,
+      "break_hop": null,
+      "matched_path_index": 0,
+      "decision": "answer",
+      "llm_answer_called": true,
+      "scores": [
+        1.0
+      ],
+      "score": 1.0,
+      "failure_layer": "ok",
+      "layer3": "정상",
+      "baseline": {
+        "answer": "답: YG 엔터테인먼트\n경로: 서태지와 아이들 -[멤버]-> 양현석 -[설립]-> YG 엔터테인먼트\n근거: \n(서태지와 아이들, 멤버, 양현석)\n(양현석, 설립, YG 엔터테인먼트)",
+        "score": 1.0
+      }
+    },
+    {
+      "id": "Q07",
+      "hops": 2,
+      "era_cross": false,
+      "route_expected": "path",
+      "route_actual": "path",
+      "idx": {
+        "exact": 0.0,
+        "relaxed": 0.0,
+        "node": 0.0,
+        "none": 1.0
+      },
+      "triple_recall": 0.0,
+      "path_prefix_recall": 0.0,
+      "break_hop": 1,
+      "matched_path_index": 0,
+      "decision": "abstain",
+      "llm_answer_called": false,
+      "scores": [
+        1.0
+      ],
+      "score": 1.0,
+      "failure_layer": "index",
+      "layer3": "색인",
+      "baseline": {
+        "answer": "근거가 부족합니다.",
+        "score": 1.0
+      }
+    },
+    {
+      "id": "Q08",
+      "hops": 2,
+      "era_cross": false,
+      "route_expected": "path",
+      "route_actual": "local",
+      "idx": {
+        "exact": 0.5,
+        "relaxed": 0.5,
+        "node": 0.5,
+        "none": 0.5
+      },
+      "triple_recall": 0.0,
+      "path_prefix_recall": 0.5,
+      "break_hop": 2,
+      "matched_path_index": 0,
+      "decision": "abstain",
+      "llm_answer_called": false,
+      "scores": [
+        0.0
+      ],
+      "score": 0.0,
+      "failure_layer": "routing",
+      "layer3": "탐색",
+      "baseline": {
+        "answer": "답: 난 알아요\n경로: 서태지와 아이들 -[1집 수록곡]-> 난 알아요\n근거: (서태지와 아이들, 1집 《Seotaiji and Boys》로 데뷔, 1992년), (서태지와 아이들, 1집에 수록될 곡, 난 알아요)",
+        "score": 1.0
+      }
+    },
+    {
+      "id": "Q09",
+      "hops": 2,
+      "era_cross": false,
+      "route_expected": "path",
+      "route_actual": "local",
+      "idx": {
+        "exact": 0.5,
+        "relaxed": 0.5,
+        "node": 0.5,
+        "none": 0.5
+      },
+      "triple_recall": 0.0,
+      "path_prefix_recall": 0.0,
+      "break_hop": 1,
+      "matched_path_index": 0,
+      "decision": "abstain",
+      "llm_answer_called": false,
+      "scores": [
+        1.0
+      ],
+      "score": 1.0,
+      "failure_layer": "routing",
+      "layer3": "탐색",
+      "baseline": {
+        "answer": "근거가 부족합니다.",
+        "score": 1.0
+      }
+    },
+    {
+      "id": "Q10",
+      "hops": 2,
+      "era_cross": false,
+      "route_expected": "path",
+      "route_actual": "path",
+      "idx": {
+        "exact": 1.0,
+        "relaxed": 1.0,
+        "node": 1.0,
+        "none": 0.0
+      },
+      "triple_recall": 0.0,
+      "path_prefix_recall": 0.0,
+      "break_hop": 1,
+      "matched_path_index": 0,
+      "decision": "abstain",
+      "llm_answer_called": false,
+      "scores": [
+        1.0
+      ],
+      "score": 1.0,
+      "failure_layer": "retrieval",
+      "layer3": "탐색",
+      "baseline": {
+        "answer": "답: Mnet 아시안 뮤직 어워드, 일본 레코드대상\n경로: 지드래곤 -[소속]-> 빅뱅 -[수상]-> Mnet 아시안 뮤직 어워드, 일본 레코드대상\n근거: \n(빅뱅, 수상, Mnet 아시안 뮤직 어워드)\n(빅뱅, 수상, 일본 레코드대상)",
+        "score": 0.0
+      }
+    },
+    {
+      "id": "Q12",
+      "hops": 2,
+      "era_cross": false,
+      "route_expected": "path",
+      "route_actual": "path",
+      "idx": {
+        "exact": 0.5,
+        "relaxed": 0.5,
+        "node": 1.0,
+        "none": 0.0
+      },
+      "triple_recall": 0.5,
+      "path_prefix_recall": 0.0,
+      "break_hop": 1,
+      "matched_path_index": 0,
+      "decision": "abstain",
+      "llm_answer_called": true,
+      "scores": [
+        0.0
+      ],
+      "score": 0.0,
+      "failure_layer": "index",
+      "layer3": "색인",
+      "baseline": {
+        "answer": "답: \"붉은 노을\"\n경로: 《Remember》 -[수록]-> \"붉은 노을\"\n근거: (\"빅뱅\", \"두 번째 정규 앨범\", \"《Remember》\"), (\"《Remember》\", \"수록\", '\"붉은 노을\"'), ('\"붉은 노을\"', \"리메이크\", \"이문세가 지난 1988년에 발표 한 곡\")",
+        "score": 1.0
+      }
+    },
+    {
+      "id": "Q15",
+      "hops": 3,
+      "era_cross": true,
+      "route_expected": "path",
+      "route_actual": "path",
+      "idx": {
+        "exact": 1.0,
+        "relaxed": 1.0,
+        "node": 1.0,
+        "none": 0.0
+      },
+      "triple_recall": 0.6666666666666666,
+      "path_prefix_recall": 0.6666666666666666,
+      "break_hop": 3,
+      "matched_path_index": 0,
+      "decision": "abstain",
+      "llm_answer_called": true,
+      "scores": [
+        0.0
+      ],
+      "score": 0.0,
+      "failure_layer": "retrieval",
+      "layer3": "탐색",
+      "baseline": {
+        "answer": "근거가 부족합니다.",
+        "score": 0.0
+      }
+    },
+    {
+      "id": "Q16",
+      "hops": 3,
+      "era_cross": false,
+      "route_expected": "path",
+      "route_actual": "path",
+      "idx": {
+        "exact": 0.3333333333333333,
+        "relaxed": 0.3333333333333333,
+        "node": 1.0,
+        "none": 0.0
+      },
+      "triple_recall": 0.3333333333333333,
+      "path_prefix_recall": 0.3333333333333333,
+      "break_hop": 2,
+      "matched_path_index": 0,
+      "decision": "abstain",
+      "llm_answer_called": false,
+      "scores": [
+        1.0
+      ],
+      "score": 1.0,
+      "failure_layer": "index",
+      "layer3": "색인",
+      "baseline": {
+        "answer": "답: 근거가 부족합니다.\n경로: SM 엔터테인먼트 -[기획]-> 그룹 -[유닛 구성: 첸·백현·시우민]-> 유닛 -[데뷔]-> 곡\n근거: (SM 엔터테인먼트, 기획, 그룹), (그룹, 유닛 구성, 첸), (그룹, 유닛 구성, 백현), (그룹, 유닛 구성, 시우민), (유닛, 데뷔, 곡)",
+        "score": 1.0
+      }
+    },
+    {
+      "id": "Q17",
+      "hops": 3,
+      "era_cross": false,
+      "route_expected": "path",
+      "route_actual": "path",
+      "idx": {
+        "exact": 0.6666666666666666,
+        "relaxed": 0.6666666666666666,
+        "node": 0.6666666666666666,
+        "none": 0.3333333333333333
+      },
+      "triple_recall": 0.6666666666666666,
+      "path_prefix_recall": 0.0,
+      "break_hop": 1,
+      "matched_path_index": 0,
+      "decision": "abstain",
+      "llm_answer_called": false,
+      "scores": [
+        1.0
+      ],
+      "score": 1.0,
+      "failure_layer": "index",
+      "layer3": "색인",
+      "baseline": {
+        "answer": "근거가 부족합니다",
+        "score": 1.0
+      }
+    },
+    {
+      "id": "Q18",
+      "hops": 3,
+      "era_cross": false,
+      "route_expected": "path",
+      "route_actual": "path",
+      "idx": {
+        "exact": 0.3333333333333333,
+        "relaxed": 0.3333333333333333,
+        "node": 0.3333333333333333,
+        "none": 0.6666666666666666
+      },
+      "triple_recall": 0.3333333333333333,
+      "path_prefix_recall": 0.0,
+      "break_hop": 1,
+      "matched_path_index": 0,
+      "decision": "abstain",
+      "llm_answer_called": false,
+      "scores": [
+        1.0
+      ],
+      "score": 1.0,
+      "failure_layer": "index",
+      "layer3": "색인",
+      "baseline": {
+        "answer": "근거가 부족합니다.",
+        "score": 1.0
+      }
+    },
+    {
+      "id": "Q19",
+      "hops": 3,
+      "era_cross": false,
+      "route_expected": "path",
+      "route_actual": "path",
+      "idx": {
+        "exact": 0.6666666666666666,
+        "relaxed": 0.6666666666666666,
+        "node": 0.6666666666666666,
+        "none": 0.3333333333333333
+      },
+      "triple_recall": 0.6666666666666666,
+      "path_prefix_recall": 0.0,
+      "break_hop": 1,
+      "matched_path_index": 0,
+      "decision": "abstain",
+      "llm_answer_called": false,
+      "scores": [
+        1.0
+      ],
+      "score": 1.0,
+      "failure_layer": "index",
+      "layer3": "색인",
+      "baseline": {
+        "answer": "근거가 부족합니다.",
+        "score": 1.0
+      }
+    },
+    {
+      "id": "Q22",
+      "hops": 1,
+      "era_cross": false,
+      "route_expected": "local",
+      "route_actual": "local",
+      "idx": {
+        "exact": 1.0,
+        "relaxed": 1.0,
+        "node": 1.0,
+        "none": 0.0
+      },
+      "triple_recall": 1.0,
+      "path_prefix_recall": 1.0,
+      "break_hop": null,
+      "matched_path_index": 0,
+      "decision": "answer",
+      "llm_answer_called": true,
+      "scores": [
+        1.0
+      ],
+      "score": 1.0,
+      "failure_layer": "ok",
+      "layer3": "정상",
+      "baseline": {
+        "answer": "근거가 부족합니다.",
+        "score": 1.0
+      }
+    }
+  ]
+}
