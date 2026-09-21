@@ -322,3 +322,137 @@ def synthesize(question: str, context: str, sources: list[str], llm) -> tuple[st
     text = resp.content
     decision = "abstain" if "근거가 부족합니다" in text else "answer"
     return text, decision, True
+
+
+import json as _json
+from pathlib import Path
+
+
+def ask(question: str, g, cfg: dict, route_llm=None, answer_llm=None) -> RAGState:
+    """LangGraph 없이 설계서 5.2 토폴로지를 직접 조립한 함수형 파이프라인이다.
+       각 노드는 이미 위에서 순수 함수로 만들었으므로, LangGraph StateGraph 는
+       이 함수 안에서 조건 분기를 그대로 옮긴 얇은 오케스트레이션일 뿐이다 —
+       조건 분기 로직 자체를 이중으로 유지하지 않기 위해 이 함수 하나가
+       정본이고, build_graph_app() 는 이 함수를 감싼 LangGraph 어댑터다."""
+    state = route_question(question, cfg, llm=route_llm)
+
+    if state["route"] == "reject":
+        state["decision"] = "abstain"
+        state["abstain_reason"] = "out_of_scope"
+        state["llm_answer_called"] = False
+        state["answer"] = insufficient_answer([])
+        _log_run(state, cfg)
+        return state
+
+    if state["route"] == "global":
+        # 전역 검색은 선택 확장(Task 18~19)이다. 아직 연결 전이면 안전하게
+        # 기권한다 — 없는 기능을 있는 척 답하지 않는다.
+        state["decision"] = "abstain"
+        state["abstain_reason"] = "no_supported_path"
+        state["llm_answer_called"] = False
+        state["answer"] = "전역 검색은 아직 연결되지 않았습니다."
+        _log_run(state, cfg)
+        return state
+
+    state["seeds"] = find_seeds(g, question, cfg, llm=route_llm)
+    if not state["seeds"]:
+        state["decision"] = "abstain"
+        state["abstain_reason"] = "no_supported_path"
+        state["llm_answer_called"] = False
+        state["answer"] = insufficient_answer([r for group in state["required_rels"] for r in group])
+        _log_run(state, cfg)
+        return state
+
+    ret = run_retrieval(g, state["seeds"], state["required_rels"], cfg)
+    state["triples"], state["trace"] = ret["triples"], ret["trace"]
+    state["radius"] = ret["radius_used"]
+    gap_rels_flat = [r for group in ret["gap_rels"] for r in group]
+
+    if gap_rels_flat:
+        state["decision"] = "abstain"
+        state["abstain_reason"] = "no_supported_path"
+        state["llm_answer_called"] = False
+        state["answer"] = insufficient_answer(gap_rels_flat)
+        _log_run(state, cfg)
+        return state
+
+    context, sources = build_context(state["triples"])
+    state["context"], state["sources"] = context, sources
+    answer, decision, called = synthesize(question, context, sources, answer_llm)
+    state["answer"], state["decision"], state["llm_answer_called"] = answer, decision, called
+    if decision == "abstain":
+        state["abstain_reason"] = "no_supported_path"
+    _log_run(state, cfg)
+    return state
+
+
+def _log_run(state: dict, cfg: dict) -> None:
+    out_dir = Path(cfg["paths"]["output_dir"])
+    out_dir.mkdir(parents=True, exist_ok=True)
+    path = out_dir / "runs.jsonl"
+    with open(path, "a", encoding="utf-8") as f:
+        f.write(_json.dumps(state, ensure_ascii=False) + "\n")
+
+
+def build_graph_app(g, cfg: dict, route_llm=None, answer_llm=None):
+    """LangGraph StateGraph 어댑터. ask() 의 조건 분기를 그래프 엣지로
+       옮긴다 — 데모(app.py)에서 trace 를 노드 단위로 시각화하려면
+       StateGraph 객체가 필요하기 때문에 별도로 노출한다.
+
+       그래프·설정·LLM은 그래프를 짓는 이 시점에 노드 클로저 안으로
+       미리 묶어 둔다. LangGraph 는 컴파일된 그래프의 각 노드를 항상
+       node(state) 한 인자로만 호출하므로, cfg 처럼 매 호출 바뀌지
+       않는 값을 노드 시그니처에 얹으면 실행 시점에 TypeError 가 난다."""
+    from langgraph.graph import END, START, StateGraph
+
+    def n_route(state):
+        return route_question(state["question"], cfg, llm=route_llm)
+
+    def n_find_seeds(state):
+        seeds = find_seeds(g, state["question"], cfg, llm=route_llm)
+        return {**state, "seeds": seeds}
+
+    def n_retrieve(state):
+        ret = run_retrieval(g, state["seeds"], state["required_rels"], cfg)
+        gap_rels_flat = [r for group in ret["gap_rels"] for r in group]
+        return {**state, "triples": ret["triples"], "trace": ret["trace"],
+                "radius": ret["radius_used"], "gap_rels": gap_rels_flat}
+
+    def n_build_context(state):
+        context, sources = build_context(state["triples"])
+        return {**state, "context": context, "sources": sources}
+
+    def n_synthesize(state):
+        answer, decision, called = synthesize(state["question"], state["context"],
+                                              state["sources"], answer_llm)
+        reason = "no_supported_path" if decision == "abstain" else None
+        return {**state, "answer": answer, "decision": decision,
+                "llm_answer_called": called, "abstain_reason": reason}
+
+    def n_insufficient(state):
+        reason = state.get("abstain_reason") or "no_supported_path"
+        gap = state.get("gap_rels", [])
+        return {**state, "decision": "abstain", "abstain_reason": reason,
+                "llm_answer_called": False, "answer": insufficient_answer(gap)}
+
+    sg = StateGraph(RAGState)
+    sg.add_node("n_route", n_route)
+    sg.add_node("n_find_seeds", n_find_seeds)
+    sg.add_node("n_retrieve", n_retrieve)
+    sg.add_node("n_build_context", n_build_context)
+    sg.add_node("n_synthesize", n_synthesize)
+    sg.add_node("n_insufficient", n_insufficient)
+
+    sg.add_edge(START, "n_route")
+    sg.add_conditional_edges("n_route", lambda s: s["route"],
+                             {"local": "n_find_seeds", "path": "n_find_seeds",
+                              "global": "n_insufficient", "vector": "n_find_seeds",
+                              "reject": "n_insufficient"})
+    sg.add_conditional_edges("n_find_seeds", lambda s: "ok" if s["seeds"] else "empty",
+                             {"ok": "n_retrieve", "empty": "n_insufficient"})
+    sg.add_conditional_edges("n_retrieve", lambda s: "gap" if s["gap_rels"] else "ok",
+                             {"gap": "n_insufficient", "ok": "n_build_context"})
+    sg.add_edge("n_build_context", "n_synthesize")
+    sg.add_edge("n_synthesize", END)
+    sg.add_edge("n_insufficient", END)
+    return sg
