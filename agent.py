@@ -151,3 +151,26 @@ def find_seeds(g, question: str, cfg: dict, llm=None) -> list[str]:
             if d["norm"] == ent_norm and nid not in found:
                 found.append(nid)
     return found[:max_seeds]
+
+
+def is_hub(g, nid: str, threshold: int) -> bool:
+    """허브 판정은 저장된 is_hub 속성이 아니라 그때그때 차수로 계산한다.
+       graph.json 의 is_hub 는 빌드 시점 임계값(25)으로 굳어 있어, 스윕이
+       다른 임계값을 시도해도 반영되지 않기 때문이다."""
+    return g.degree(nid) > threshold
+
+
+def edge_score(g, tail_id: str, edge: dict, state: dict, cfg: dict) -> float:
+    origin_key = "+".join(sorted(edge["origins"])) if isinstance(edge.get("origins"), list) \
+        else edge.get("origins", "llm")
+    base = cfg["retrieval"]["origin_base_score"].get(origin_key, 0.8)
+    exp = cfg["retrieval"]["degree_penalty_exponent"]
+    pen = 1.0 / (1.0 + g.degree(tail_id) ** exp)
+    rel = edge["relation"]
+    if rel in state.get("gap_rels", []):
+        prio = 1.3
+    elif rel in schema.BRIDGE_RELATIONS:
+        prio = 1.15
+    else:
+        prio = 1.0
+    return base * edge["agreement"] * pen * prio
