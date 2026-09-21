@@ -113,3 +113,41 @@ def route_question(question: str, cfg: dict, llm=None) -> RAGState:
     state["route_by"] = "llm"
     state["required_rels"] = parsed.get("required_rels", [])
     return state
+
+
+import normalize as nz
+
+
+def find_seeds(g, question: str, cfg: dict, llm=None) -> list[str]:
+    """정확매칭 -> 부분매칭 -> (0건일 때만) LLM.
+       LLM 단계가 설계서의 '퍼지 매칭'을 겸한다 — 편집 거리 기반 문자열
+       유사도 대신 LLM에게 질문에서 개체명을 직접 뽑게 하고, 뽑힌 문자열을
+       다시 그래프에 정규화 대조한다. 한국어 조사·표기 변형(대소문자·
+       띄어쓰기)에는 이쪽이 편집 거리보다 안정적이다."""
+    max_seeds = cfg["retrieval"]["max_seeds"]
+
+    exact = [nid for nid, d in g.nodes(data=True)
+             if len(d["name"]) >= 2 and d["name"] in question]
+    if exact:
+        exact.sort(key=lambda nid: -len(g.nodes[nid]["name"]))
+        return exact[:max_seeds]
+
+    qnorm = nz.norm_key(question)
+    partial = [nid for nid, d in g.nodes(data=True)
+               if len(d["norm"]) >= 2 and d["norm"] in qnorm]
+    if partial:
+        partial.sort(key=lambda nid: -len(g.nodes[nid]["norm"]))
+        return partial[:max_seeds]
+
+    if llm is None:
+        return []
+    resp = llm.invoke(f"다음 질문에서 언급된 고유명사(인물·그룹·곡·앨범·회사)만 "
+                       f"JSON으로 뽑아라. 형식: {{\"entities\": [\"...\"]}}\n\n질문: {question}")
+    parsed = _parse_route_json(resp.content)
+    found = []
+    for ent in parsed.get("entities", []):
+        ent_norm = nz.norm_key(ent)
+        for nid, d in g.nodes(data=True):
+            if d["norm"] == ent_norm and nid not in found:
+                found.append(nid)
+    return found[:max_seeds]
