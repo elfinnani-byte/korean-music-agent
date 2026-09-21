@@ -89,6 +89,34 @@ def test_covered_edge_is_derived_from_cover_flag():
     assert covered[0][2]["origins"] == ["derived"]
 
 
+def test_merge_infers_type_from_relation_when_unknown():
+    """실측 버그: FORMED_IN/DEBUTED_IN/RELEASED_IN 대상('1990s' 등)은
+       LLM이 영문 연대 코드를 우연히 쓰지 않는 한 types 사전에 없어서
+       간선 전체가 통째로 드롭됐다(52건 코퍼스에서 0건 생존). WON도
+       규칙만으로 얻은 시상식 이름이 같은 이유로 부분 드롭됐다.
+       스키마상 관계마다 대상 타입이 하나로 고정돼 있으므로
+       (SIGNED_TO/FOUNDED->Label, WON->Award, HAS_GENRE->Genre,
+       FORMED_IN/DEBUTED_IN/RELEASED_IN->Era) types 사전에 없어도
+       관계에서 타입을 추론해야 한다."""
+    # 헤드(아티스트·그룹) 타입은 실제 파이프라인에서 문서 자체의 분류
+    # 투표로 채워진다. 이 테스트가 재현하는 버그는 테일(연대·시상식·
+    # 레이블처럼 자기 문서가 없는 폐쇄 어휘) 쪽이므로 헤드 타입은
+    # 미리 채워 둔다.
+    types = {"서태지와 아이들": "Group", "아이유": "Artist",
+             "빅뱅": "Group", "보아": "Artist"}
+    g, report = nz.merge_triples([
+        _tri("서태지와 아이들", "FORMED_IN", "1990s", props={"year": 1991}),
+        _tri("아이유", "DEBUTED_IN", "2000s", props={"year": 2008}),
+        _tri("빅뱅", "WON", "골든디스크"),
+        _tri("보아", "SIGNED_TO", "SM 엔터테인먼트"),
+    ], {"normalize": {"entity_type_overrides": {}}}, types=types)
+    assert g.number_of_edges() == 4
+    assert g.nodes["era:1990s"]["type"] == "Era"
+    assert g.nodes["award:골든디스크"]["type"] == "Award"
+    assert g.nodes["label:sm엔터테인먼트"]["type"] == "Label"
+    assert report["dropped_junk"] == []
+
+
 def test_labelmate_edges_are_never_created():
     """SM 소속 30명이면 435개 간선이 생겨 그래프를 오염시킨다."""
     g = nx.MultiDiGraph()

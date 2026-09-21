@@ -1,0 +1,328 @@
+{
+  "docs": 52,
+  "nodes": 1468,
+  "edges": 1589,
+  "edges_by_relation": {
+    "FORMED_IN": 45,
+    "DEBUTED_IN": 61,
+    "WON": 118,
+    "COLLABORATED_WITH": 20,
+    "SIGNED_TO": 108,
+    "RELEASED": 371,
+    "PERFORMED": 307,
+    "HAS_GENRE": 36,
+    "RELEASED_IN": 284,
+    "INFLUENCED": 4,
+    "CONTAINS": 103,
+    "SUBUNIT_OF": 1,
+    "MEMBER_OF": 85,
+    "WROTE": 21,
+    "PRODUCED": 1,
+    "FOUNDED": 6,
+    "TOPPED_ON": 18
+  },
+  "edges_by_origin": {
+    "llm+rule": 43,
+    "llm": 1444,
+    "rule": 102
+  },
+  "nodes_by_type": {
+    "Group": 68,
+    "Era": 5,
+    "Award": 71,
+    "Label": 49,
+    "Genre": 9,
+    "Album": 606,
+    "Artist": 144,
+    "Song": 512,
+    "Program": 4
+  },
+  "quote": {
+    "quote_total": 1912,
+    "quote_kept": 1777,
+    "quote_pass_rate": 0.9293933054393305,
+    "quote_failed_samples": [
+      {
+        "h": "015B",
+        "h_type": "Group",
+        "r": "FORMED_IN",
+        "t": "1990S",
+        "t_type": "Era",
+        "props": {
+          "year": "1990"
+        },
+        "origins": [
+          "llm"
+        ],
+        "agreement": 0.8,
+        "sources": [
+          "015B"
+        ],
+        "quotes": []
+      },
+      {
+        "h": "2Am",
+        "h_type": "Group",
+        "r": "FORMED_IN",
+        "t": "2000S",
+        "t_type": "Era",
+        "props": {
+          "year": "2008"
+        },
+        "origins": [
+          "llm"
+        ],
+        "agreement": 0.8,
+        "sources": [
+          "2AM"
+        ],
+        "quotes": []
+      },
+      {
+        "h": "2Am",
+        "h_type": "Group",
+        "r": "DEBUTED_IN",
+        "t": "2000S",
+        "t_type": "Era",
+        "props": {
+          "year": "2008"
+        },
+        "origins": [
+          "llm"
+        ],
+        "agreement": 0.8,
+        "sources": [
+          "2AM"
+        ],
+        "quotes": []
+      },
+      {
+        "h": "2Ne1",
+        "h_type": "Group",
+        "r": "RELEASED",
+        "t": "Collection",
+        "t_type": "Album",
+        "props": {},
+        "origins": [
+          "llm"
+        ],
+        "agreement": 0.8,
+        "sources": [
+          "2NE1"
+        ],
+        "quotes": [
+          "2012년부터 일본 진출을 발표했고 2012년 첫 일본 정규 음반 Collection을 발매했다."
+        ]
+      },
+      {
+        "h": "Collection",
+        "h_type": "Album",
+        "r": "RELEASED_IN",
+        "t": "2010S",
+        "t_type": "Era",
+        "props": {
+          "year": "2012"
+        },
+        "origins": [
+          "llm"
+        ],
+        "agreement": 0.8,
+        "sources": [
+          "2NE1"
+        ],
+        "quotes": [
+          "2012년부터 일본 진출을 발표했고 2012년 첫 일본 정규 음반 Collection을 발매했다."
+        ]
+      },
+      {
+        "h": "2Ne1",
+        "h_type": "Group",
+        "r": "PERFORMED",
+        "t": "Hate You",
+        "t_type": "Song",
+        "props": {},
+        "origins": [
+          "llm"
+        ],
+        "agreement": 0.8,
+        "sources": [
+          "2NE1"
+        ],
+        "quotes": [
+          "이에 앞서 \"Hate You\"를 세 번째 싱글로 발매해 다수 음원차트에서 실시간 1위에 올랐다."
+        ]
+      },
+      {
+        "h": "2Ne1",
+        "h_type": "Group",
+        "r": "DEBUTED_IN",
+        "t": "2010S",
+        "t_type": "Era",
+        "props": {
+          "year": "2010s"
+        },
+        "origins": [
+          "llm"
+        ],
+        "agreement": 0.8,
+        "sources": [
+          "2NE1"
+        ],
+        "quotes": [
+          "2011년 7월 21일에는 미니 앨범의 수록곡들이 공개되었고, 이에 앞서 \"Hate You\"를 세 번째 싱글로 발매해 다수 음원차트에서 실시간 1위에 올랐다."
+        ]
+      },
+      {
+        "h": "Allday Project",
+        "h_type": "Group",
+        "r": "WON",
+        "t": "2025 아시아 아티스트 어워즈 베스트 아티스트상",
+        "t_type": "Award",
+        "props": {
+          "year": "2025"
+        },
+        "origins": [
+          "llm"
+        ],
+        "agreement": 0.8,
+        "sources": [
+          "ALLDAY PROJECT"
+        ],
+        "quotes": [
+          "2025년 2025 아시아 아티스트 어워즈 베스트 아티스트상"
+        ]
+      },
+      {
+        "h": "Allday Project",
+        "h_type": "Group",
+        "r": "WON",
+        "t": "2025 아시아 아티스트 어워즈 여자 신인상",
+        "t_type": "Award",
+        "props": {
+          "year": "2025"
+        },
+        "origins": [
+          "llm"
+        ],
+        "agreement": 0.8,
+        "sources": [
+          "ALLDAY PROJECT"
+        ],
+        "quotes": [
+          "2025년 2025 아시아 아티스트 어워즈 여자 신인상"
+        ]
+      },
+      {
+        "h": "Allday Project",
+        "h_type": "Group",
+        "r": "WON",
+        "t": "2025 아시아 아티스트 어워즈 뉴 웨이브상",
+        "t_type": "Award",
+        "props": {
+          "year": "2025"
+        },
+        "origins": [
+          "llm"
+        ],
+        "agreement": 0.8,
+        "sources": [
+          "ALLDAY PROJECT"
+        ],
+        "quotes": [
+          "2025년 2025 아시아 아티스트 어워즈 뉴 웨이브상"
+        ]
+      },
+      {
+        "h": "태연",
+        "h_type": "Artist",
+        "r": "PERFORMED",
+        "t": "I (Feat. 버벌진트)",
+        "t_type": "Song",
+        "props": {},
+        "origins": [
+          "llm"
+        ],
+        "agreement": 0.8,
+        "sources": [
+          "K-pop"
+        ],
+        "quotes": [
+          "현아의 Bubble Pop! 유튜브 뮤직비디오와 Ice Cream (Feat. Maboos) 유튜브 뮤직비디오와 잘나가서 그래 (Feat. 정일훈 Of BTOB) 유튜브 뮤직비디오, 아이유의 팔레트 (Feat. G-DRAGON) 유튜브 뮤직비디오, 제니의 SOLO 유튜브 뮤직비디오, 선미의 가시나 유튜브 뮤직비디오가 각각 유튜브 조회수 1억 회를 달성했다."
+        ]
+      },
+      {
+        "h": "제니",
+        "h_type": "Artist",
+        "r": "PERFORMED",
+        "t": "Solo",
+        "t_type": "Song",
+        "props": {},
+        "origins": [
+          "llm"
+        ],
+        "agreement": 0.8,
+        "sources": [
+          "K-pop"
+        ],
+        "quotes": [
+          "현아의 Bubble Pop! 유튜브 뮤직비디오와 Ice Cream (Feat. Maboos) 유튜브 뮤직비디오와 잘나가서 그래 (Feat. 정일훈 Of BTOB) 유튜브 뮤직비디오, 아이유의 팔레트 (Feat. G-DRAGON) 유튜브 뮤직비디오, 선미의 가시나 유튜브 뮤직비디오가 각각 유튜브 조회수 1억 회를 달성했다."
+        ]
+      },
+      {
+        "h": "선미",
+        "h_type": "Artist",
+        "r": "PERFORMED",
+        "t": "가시나",
+        "t_type": "Song",
+        "props": {},
+        "origins": [
+          "llm"
+        ],
+        "agreement": 0.8,
+        "sources": [
+          "K-pop"
+        ],
+        "quotes": [
+          "현아의 Bubble Pop! 유튜브 뮤직비디오와 Ice Cream (Feat. Maboos) 유튜브 뮤직비디오와 잘나가서 그래 (Feat. 정일훈 Of BTOB) 유튜브 뮤직비디오, 아이유의 팔레트 (Feat. G-DRAGON) 유튜브 뮤직비디오, 선미의 가시나 유튜브 뮤직비디오가 각각 유튜브 조회수 1억 회를 달성했다."
+        ]
+      }
+    ],
+    "chunk_failures": []
+  },
+  "normalize_report": {
+    "dropped_junk": [
+      "록",
+      "록",
+      "짝",
+      "짝",
+      "달",
+      "1",
+      "2015년",
+      "길",
+      "빛",
+      "슈",
+      "슈",
+      "S",
+      "S",
+      "2017년",
+      "팝",
+      "怒",
+      "1996년",
+      "怒",
+      "怒",
+      "빛",
+      "2014년",
+      "[E]",
+      "ㅋ",
+      "21세기 데뷔한 가수 중 최초의 기록",
+      "21세기 데뷔한 가수 중 최초의 기록",
+      "가요톱10_1980S",
+      "가요톱10_1980S",
+      "가요톱10_1980S",
+      "가요톱10_1980S",
+      "가요톱10_1980S"
+    ],
+    "type_conflicts": [],
+    "symmetric_collapsed": 0
+  }
+}

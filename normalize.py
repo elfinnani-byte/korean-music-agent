@@ -13,6 +13,7 @@ PARTICLE_AFTER_BRACKET = re.compile(
     r"(?<=[)\]〉》」』])\s*(?:은|는|이|가|을|를|의|에|와|과|도|만|로|으로)$"
 )
 BARE_YEAR = re.compile(r"^\d{3,4}년?$")
+ERAS_LOWER = {e.lower() for e in schema.ERAS}
 
 
 def clean_name(s: str) -> str:
@@ -39,6 +40,8 @@ def is_junk(name: str, ntype: str) -> bool:
     if ntype not in schema.NODE_TYPES:
         return True
     if BARE_YEAR.match(n) and schema.NODE_TYPES.get(ntype) == "attribute":
+        return True
+    if ntype == "Era" and n.lower() not in ERAS_LOWER:
         return True
     return False
 
@@ -97,6 +100,31 @@ def canonical_symmetric(a: tuple[str, str], b: tuple[str, str]):
 import networkx as nx
 
 
+def _relation_implied_types() -> dict[tuple[str, str], str]:
+    """관계마다 h·t 타입이 스키마 전체에서 하나로 고정되는 경우만 등록한다.
+       SIGNED_TO/FOUNDED->Label, WON->Award, HAS_GENRE->Genre,
+       FORMED_IN/DEBUTED_IN/RELEASED_IN->Era 처럼 대상이 폐쇄 어휘라
+       LLM이 우연히 같은 문자열로 언급하지 않으면 types 사전에 절대
+       등록되지 않는다. 그 결과 이런 관계의 간선이 통째로 드롭됐다
+       (실측: 52건 코퍼스에서 FORMED_IN/DEBUTED_IN/RELEASED_IN 0건 생존)."""
+    by_rel_h: dict[str, set[str]] = {}
+    by_rel_t: dict[str, set[str]] = {}
+    for h_type, rel, t_type in schema.REL_TRIPLES:
+        by_rel_h.setdefault(rel, set()).add(h_type)
+        by_rel_t.setdefault(rel, set()).add(t_type)
+    implied: dict[tuple[str, str], str] = {}
+    for rel, types_ in by_rel_h.items():
+        if len(types_) == 1:
+            implied[(rel, "h")] = next(iter(types_))
+    for rel, types_ in by_rel_t.items():
+        if len(types_) == 1:
+            implied[(rel, "t")] = next(iter(types_))
+    return implied
+
+
+RELATION_IMPLIED_TYPES = _relation_implied_types()
+
+
 def _context_of(triple: dict, side: str) -> str | None:
     """Song·Album 노드의 맥락을 삼중항에서 유추한다."""
     if side == "t" and triple["r"] in ("PERFORMED", "RELEASED", "WROTE", "PRODUCED"):
@@ -117,7 +145,8 @@ def merge_triples(triples: list[dict], cfg: dict,
     report = {"dropped_junk": [], "type_conflicts": [], "symmetric_collapsed": 0}
 
     def ensure(name: str, triple: dict, side: str) -> str | None:
-        ntype = overrides.get(clean_name(name)) or types.get(name)
+        ntype = (overrides.get(clean_name(name)) or types.get(name)
+                 or RELATION_IMPLIED_TYPES.get((triple["r"], side)))
         if ntype is None or is_junk(name, ntype):
             report["dropped_junk"].append(name)
             return None

@@ -1,11 +1,13 @@
 """graph.json 이 정준 런타임 그래프. graphml 은 제출·시각화용 파생물."""
 import json
 import os
+import re
 from pathlib import Path
 
 import networkx as nx
 
 SCALAR = (str, int, float, bool)
+CONTROL_CHARS = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f]")
 
 
 def write_json(g: nx.MultiDiGraph, path: Path) -> None:
@@ -28,6 +30,12 @@ def read_json(path: Path) -> nx.MultiDiGraph:
     return g
 
 
+def _xml_safe(s: str) -> str:
+    """LLM 추출 quote 에 XML이 담지 못하는 제어 문자가 섞여 들어올 수 있다.
+       graph.json(정준본)은 그대로 두고, graphml(파생본)에서만 제거한다."""
+    return CONTROL_CHARS.sub("", s)
+
+
 def _flatten(d: dict) -> dict:
     """graphml 은 스칼라만 저장한다. 리스트는 조인하고 None 은 생략한다."""
     out = {}
@@ -35,14 +43,16 @@ def _flatten(d: dict) -> dict:
         if v is None:
             continue
         if isinstance(v, (list, tuple, set)):
-            out[k] = "|".join(str(x) for x in v)
+            out[k] = _xml_safe("|".join(str(x) for x in v))
         elif isinstance(v, dict):
             if v:
-                out[k] = json.dumps(v, ensure_ascii=False)
+                out[k] = _xml_safe(json.dumps(v, ensure_ascii=False))
+        elif isinstance(v, str):
+            out[k] = _xml_safe(v)
         elif isinstance(v, SCALAR):
             out[k] = v
         else:
-            out[k] = str(v)
+            out[k] = _xml_safe(str(v))
     return out
 
 

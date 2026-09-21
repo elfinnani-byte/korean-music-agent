@@ -59,3 +59,18 @@ def test_graphml_omits_none_instead_of_writing_empty_string(tmp_path):
     graph_io.write_graphml(g, p)
     back = nx.read_graphml(p)
     assert "year" not in back.nodes["song:x:_"]
+
+
+def test_graphml_strips_control_characters_from_quotes(tmp_path):
+    """실측 사례: LLM 이 뽑은 quote 에 \\x1c \\x1d 제어 문자가 섞여
+       나와 lxml graphml writer 가 ValueError 로 죽었다.
+       graph.json(정준본)은 그대로 두고 graphml(파생본)에서만 지운다."""
+    g = _sample()
+    g.add_edge("artist:양현석", "label:yg", relation="WROTE",
+               props={}, origins=["llm"], agreement=0.8, count=1,
+               sources=["x"], quotes=["\x1cBlack Map\x1d은 한정판이다."])
+    p = tmp_path / "graph.graphml"
+    graph_io.write_graphml(g, p)
+    back = nx.read_graphml(p)
+    quotes = [d["quotes"] for _, _, d in back.edges(data=True) if "quotes" in d]
+    assert any("Black Map" in q and "\x1c" not in q for q in quotes)
