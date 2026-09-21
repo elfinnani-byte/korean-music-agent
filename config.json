@@ -1,0 +1,113 @@
+{
+  "version": "1.0",
+  "domain": "한국 대중음악 1992~현재",
+
+  "scope": {
+    "from_year": 1992,
+    "note": "서태지와 아이들 데뷔 이후. 시드 기준이며 리메이크 원곡자 등은 범위 밖도 허용",
+    "eras": ["1980s 이전", "1990s", "2000s", "2010s", "2020s"],
+    "quota_eras": ["1990s", "2000s", "2010s", "2020s"]
+  },
+
+  "paths": {
+    "docs_dir": "data/docs",
+    "goldenset": "data/goldenset.json",
+    "manifest": "data/manifest.json",
+    "output_dir": "output"
+  },
+
+  "collect": {
+    "seed_titles": [
+      "한국대중음악상", "골든 디스크 어워즈", "가요톱10", "엠카운트다운",
+      "서태지와 아이들", "H.O.T.", "015B", "신승훈",
+      "보아", "빅뱅 (음악 그룹)", "에픽하이",
+      "아이유", "방탄소년단", "장기하와 얼굴들", "NewJeans",
+      "SM 엔터테인먼트", "YG 엔터테인먼트", "유영진 (작곡가)", "K-pop"
+    ],
+    "target_docs": 70,
+    "per_era_min": 14,
+    "min_body_chars": 1200,
+    "link_limit_per_seed": 300,
+    "request_delay_sec": 1.0,
+    "retry": {"max_attempts": 5, "backoff_base_sec": 2.0, "respect_retry_after": true},
+    "user_agent": "my-graph-agent/1.0 (educational project)",
+    "redirect_map": {
+      "SM엔터테인먼트": "SM 엔터테인먼트",
+      "골든디스크": "골든 디스크 어워즈",
+      "악동뮤지션": "AKMU",
+      "뉴진스": "NewJeans",
+      "블랙핑크": "BLACKPINK",
+      "케이팝": "K-pop",
+      "빅뱅": "빅뱅 (음악 그룹)",
+      "유영진": "유영진 (작곡가)"
+    }
+  },
+
+  "schema": {
+    "source": "schema.py 의 REL_TRIPLES 가 단일 진실 공급원이다. 여기에 복사하지 않는다",
+    "enable_program_type": true
+  },
+
+  "normalize": {
+    "min_name_len": 2,
+    "entity_type_overrides": {
+      "서태지": "Artist",
+      "서태지와 아이들": "Group",
+      "빅뱅": "Group",
+      "god": "Group",
+      "태연": "Artist",
+      "소녀시대": "Group",
+      "아이유": "Artist",
+      "유영진": "Artist"
+    }
+  },
+
+  "build": {
+    "max_doc_chars": 6000,
+    "chunk_chars": 2400,
+    "chunk_overlap": 200,
+    "workers": 8,
+    "use_cache": true,
+    "extraction_version": "v1",
+    "quote_verification": {"enabled": true, "drop_on_fail": true}
+  },
+
+  "retrieval": {
+    "radius": 2,
+    "max_radius": 3,
+    "per_relation": 10,
+    "max_triples": 200,
+    "per_node_out": 8,
+    "max_seeds": 3,
+    "hub_degree_threshold": 25,
+    "degree_penalty_exponent": 0.5,
+    "quota_exempt_origins": ["rule", "tracklist"],
+    "quota_exempt_relations": ["INFLUENCED", "COVERED", "PRODUCED", "WROTE", "FOUNDED"],
+    "bridge_min_agreement": 0.8
+  },
+
+  "gates": {
+    "density": {
+      "min_docs": 70,
+      "min_docs_per_era": 14,
+      "min_avg_cross_mentions": 3.0,
+      "min_multi_seed_ratio": 0.40,
+      "min_long_range_pairs": 10
+    },
+    "graph": {
+      "min_largest_component_ratio": 0.85,
+      "min_bridge_edges": 20
+    }
+  },
+
+  "llm": {
+    "profiles": {
+      "extract": {"provider": "openai", "model": "gpt-4.1-mini", "temperature": 0.0},
+      "answer": {"provider": "openai", "model": "gpt-4.1", "temperature": 0.0},
+      "judge": {"provider": "google", "model": "gemini-2.5-flash", "temperature": 0.0}
+    },
+    "env_keys": {"openai": "OPENAI_API_KEY", "google": "GOOGLE_API_KEY"},
+    "request_timeout_sec": 90,
+    "max_retries": 3
+  }
+}
