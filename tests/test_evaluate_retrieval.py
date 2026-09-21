@@ -30,6 +30,32 @@ def test_path_prefix_recall_takes_max_over_alternatives():
     assert recall == 1.0 and idx == 1
 
 
+def test_path_prefix_recall_searches_within_hop_not_by_flat_position():
+    """실측 버그: trace 는 한 홉에서 찾은 '모든' 간선을 담는다(예: 빅뱅
+       노드에서 WON·HAS_GENRE·WON·WON·... 이 DEBUTED_IN 보다 먼저 옴,
+       점수 내림차순이기 때문). trace[i] 를 곧바로 '기대 경로의 i번째
+       홉'으로 취급하면, 같은 홉에 관련 없는 간선이 여럿 있을 때마다
+       거의 항상 0홉에서 끊긴 것처럼 나온다 — 실제로는 hop=1 안에
+       기대한 관계가 있는데도 그렇다. hop 번호로 걸러 그 안에서
+       찾아야 한다."""
+    trace = [
+        {"hop": 1, "head": "빅뱅", "rel": "WON", "tail": "멜론 뮤직 어워드", "dir": "out"},
+        {"hop": 1, "head": "빅뱅", "rel": "HAS_GENRE", "tail": "댄스", "dir": "out"},
+        {"hop": 1, "head": "빅뱅", "rel": "DEBUTED_IN", "tail": "2000s", "dir": "out"},
+        {"hop": 1, "head": "빅뱅", "rel": "WON", "tail": "골든디스크", "dir": "out"},
+    ]
+    paths = [[{"hop": 1, "rel": "DEBUTED_IN", "dir": "out", "to_type": "Era"}]]
+    recall, break_hop, idx = ev.path_prefix_recall(paths, trace)
+    assert recall == 1.0 and break_hop is None
+
+
+def test_path_prefix_recall_still_breaks_when_hop_truly_missing():
+    trace = [{"hop": 1, "head": "빅뱅", "rel": "WON", "tail": "멜론 뮤직 어워드", "dir": "out"}]
+    paths = [[{"hop": 1, "rel": "DEBUTED_IN", "dir": "out", "to_type": "Era"}]]
+    recall, break_hop, idx = ev.path_prefix_recall(paths, trace)
+    assert recall == 0.0 and break_hop == 1
+
+
 def test_triple_recall_counts_expected_triples_present_in_final_triples():
     triples = [{"h": "양현석", "r": "MEMBER_OF", "t": "서태지와 아이들"}]
     expected = [["양현석", "MEMBER_OF", "서태지와 아이들"], ["양현석", "FOUNDED", "YG 엔터테인먼트"]]

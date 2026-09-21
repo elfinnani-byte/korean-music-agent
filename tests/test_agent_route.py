@@ -34,6 +34,27 @@ def test_rule_pass_returns_none_when_nothing_matches():
     assert agent.route_by_rule("오늘 서울의 날씨는 어떤가요?") == (None, None, None)
 
 
+def test_rule_pass_disambiguates_sosok_as_member_of_when_followed_by_group():
+    """실측 버그: '소속'은 중의적이다 — '~에 소속된 그룹은'(사람->그룹,
+       MEMBER_OF)과 'OO 기획사에 소속된 [그룹이름]'(그룹->회사,
+       SIGNED_TO)이 똑같이 '소속'을 쓴다. 골든셋 Q10('지드래곤이
+       소속된 그룹이...')이 SIGNED_TO로만 잘못 매핑돼 MEMBER_OF 간선이
+       우선순위에서 밀려 사라졌다. '소속된 그룹'이 바로 붙어 있을
+       때만 MEMBER_OF 이고, 그 사이에 회사·그룹 이름이 끼면(예:
+       '기획사에 소속된 Stray Kids') SIGNED_TO 다."""
+    route, by, rels = agent.route_by_rule("지드래곤이 소속된 그룹이 수상한 시상식 두 곳은?")
+    flat = [r for group in rels for r in group]
+    assert "MEMBER_OF" in flat
+    assert "SIGNED_TO" not in flat
+
+
+def test_rule_pass_keeps_signed_to_when_group_name_intervenes():
+    route, by, rels = agent.route_by_rule("박진영이 설립한 기획사에 소속된 Stray Kids의 데뷔 타이틀곡은?")
+    flat = [r for group in rels for r in group]
+    assert "SIGNED_TO" in flat
+    assert "MEMBER_OF" not in flat
+
+
 def test_route_question_uses_rule_pass_first_without_calling_llm():
     called = {"n": 0}
 

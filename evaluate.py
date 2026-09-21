@@ -60,14 +60,25 @@ import agent
 
 
 def path_prefix_recall(expected_paths: list[list[dict]], trace: list[dict]) -> tuple[float, int | None, int]:
-    """대안 경로마다 시드에서부터 (rel, dir) 순서로 trace 를 따라가고
+    """대안 경로마다 각 홉에서 (rel, dir) 가 실제로 확보됐는지 확인하고
        가장 높은 접두 재현율을 취한다.
-       반환: (최대 접두 재현율, 그 경로의 최초 실패 홉, 선택된 대안 인덱스)."""
+       반환: (최대 접두 재현율, 그 경로의 최초 실패 홉, 선택된 대안 인덱스).
+
+       trace[i] 를 '기대 경로의 i번째 홉'으로 그대로 대응시키면 안 된다
+       (실측 버그). trace 는 한 홉에서 찾은 모든 간선을 점수 내림차순으로
+       담는다 — 노드 하나에서 관계가 여럿(WON·HAS_GENRE·WON·...) 나오면
+       기대한 관계가 맨 앞이 아닌 한 거의 항상 0홉에서 끊긴 것처럼
+       나온다. trace 의 hop 번호로 걸러 그 홉 구간 '안에서' 찾는다."""
+    by_hop: dict[int, list[dict]] = {}
+    for t in trace:
+        by_hop.setdefault(t["hop"], []).append(t)
+
     best_recall, best_break, best_idx = 0.0, 1, 0
     for idx, path in enumerate(expected_paths):
         matched = 0
-        for i, step in enumerate(path):
-            if i < len(trace) and trace[i]["rel"] == step["rel"] and trace[i]["dir"] == step["dir"]:
+        for step in path:
+            hop_entries = by_hop.get(step["hop"], [])
+            if any(e["rel"] == step["rel"] and e["dir"] == step["dir"] for e in hop_entries):
                 matched += 1
             else:
                 break

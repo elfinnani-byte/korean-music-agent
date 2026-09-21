@@ -84,6 +84,20 @@ def route_by_rule(question: str) -> tuple[str | None, str | None, list[list[str]
     for pattern, rels in schema.CUE_TO_RELATIONS.items():
         if re.search(pattern, question):
             matched.append(rels)
+
+    # '소속'은 중의적이다 — '지드래곤이 소속된 그룹은'(사람->그룹,
+    # MEMBER_OF)과 '기획사에 소속된 [그룹이름]'(그룹->회사, SIGNED_TO)이
+    # 똑같이 '소속'을 쓴다. CUE_TO_RELATIONS 는 늘 SIGNED_TO로만 매핑해
+    # 골든셋 Q10에서 MEMBER_OF 간선이 required_rels 에 빠지고, per_node_out
+    # 우선순위 경쟁에서도 밀려 사라졌다(실측). 주격 조사(이/가)가 바로
+    # 앞에 붙고 '그룹'이 바로 뒤에 오면(예: "지드래곤이 소속된 그룹") 그
+    # 사람이 속한 그룹을 묻는 것이지 그룹이 어느 회사 소속인지를 묻는
+    # 것이 아니다 — 이때만 SIGNED_TO 를 MEMBER_OF 로 바꿔친다. "회사에
+    # 소속된 그룹"처럼 조사가 다르면(에) 원래 의미(SIGNED_TO) 그대로 둔다.
+    if re.search(r"[이가]\s*소속된\s*그룹", question):
+        matched = [g for g in matched if g != ["SIGNED_TO"]]
+        matched.append(["MEMBER_OF"])
+
     if not matched:
         return None, None, None
     route = "local" if len(matched) == 1 else "path"
@@ -224,14 +238,20 @@ def expand_one_hop(g, state: dict, cfg: dict) -> dict:
     for nid in state["frontier"]:
         if is_hub(g, nid, threshold) and nid not in seeds:
             continue  # 허브는 시드가 아니면 확장 시작점으로 쓰지 않는다
-        out_edges = list(g.out_edges(nid, data=True))[:per_node_out]
-        for _, v, data in out_edges:
+        # per_node_out 은 점수를 매기기 '전' 그래프 삽입 순서로 자르면 안
+        # 된다(실측 버그) — 필요한 간선이 원시 순서상 늦게 나온다는
+        # 이유만으로 점수도 못 받아 보고 사라진다. 이 노드에서 나온
+        # 모든 후보의 점수를 먼저 계산하고, 그중 상위 per_node_out 개만
+        # 남긴다.
+        node_candidates: list[tuple] = []
+        for _, v, data in g.out_edges(nid, data=True):
             e = {"origins": data["origins"], "agreement": data["agreement"], "relation": data["relation"]}
-            candidates.append((edge_score(g, v, e, state, cfg), "out", nid, v, data["relation"], data))
-        in_edges = list(g.in_edges(nid, data=True))[:per_node_out]
-        for u, _, data in in_edges:
+            node_candidates.append((edge_score(g, v, e, state, cfg), "out", nid, v, data["relation"], data))
+        for u, _, data in g.in_edges(nid, data=True):
             e = {"origins": data["origins"], "agreement": data["agreement"], "relation": data["relation"]}
-            candidates.append((edge_score(g, nid, e, state, cfg), "in", u, nid, data["relation"], data))
+            node_candidates.append((edge_score(g, nid, e, state, cfg), "in", u, nid, data["relation"], data))
+        node_candidates.sort(key=lambda c: -c[0])
+        candidates.extend(node_candidates[:per_node_out])
 
     selected = _select_within_budget(candidates, cfg)
 

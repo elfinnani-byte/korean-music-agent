@@ -70,6 +70,30 @@ def test_expand_allows_hub_node_when_it_is_a_seed():
     assert len(out["trace"]) > 0, "시드일 때는 SM 소속 가수는? 같은 질문에 답해야 한다"
 
 
+def test_expand_per_node_out_keeps_highest_scored_edges_not_first_in_graph_order():
+    """실측 버그: per_node_out 절단을 점수 계산 '이전'에 원시 순서
+       그대로 걸면(g.out_edges(nid)[:8]), 정작 필요한 간선이 그래프
+       삽입 순서상 9번째라는 이유만으로 점수 한 번 못 매겨 보고
+       통째로 사라진다. 지드래곤(out-degree 9)의 MEMBER_OF 간선이
+       정확히 이렇게 사라져 골든셋 Q10이 실패했다. gap_rels 우선순위
+       1.3배를 받는 관계는, 그래프 삽입 순서가 몇 번째든 8개 안에
+       들어야 한다."""
+    g = nx.MultiDiGraph()
+    g.add_node("artist:a", name="a", type="Artist", norm="a")
+    g.add_node("group:target", name="target", type="Group", norm="target")
+    # MEMBER_OF 를 마지막(9번째)에 추가해 삽입 순서상 최하위로 둔다
+    for i in range(8):
+        g.add_node(f"song:{i}", name=str(i), type="Song", norm=str(i))
+        g.add_edge("artist:a", f"song:{i}", relation="PERFORMED", origins=["rule"], agreement=1.0)
+    g.add_edge("artist:a", "group:target", relation="MEMBER_OF", origins=["rule"], agreement=1.0)
+
+    state = {"frontier": ["artist:a"], "visited": ["artist:a"], "seeds": ["artist:a"],
+             "triples": [], "trace": [], "gap_rels": ["MEMBER_OF"], "radius": 1}
+    out = agent.expand_one_hop(g, state, CFG)
+    rels = {t["rel"] for t in out["trace"]}
+    assert "MEMBER_OF" in rels, "삽입 순서상 9번째라고 점수도 못 매겨 보고 잘리면 안 된다"
+
+
 def test_expand_respects_per_relation_cap_but_exempts_bridge_relations():
     """PERFORMED 간선은 origins=['llm']로 둔다 — ['rule']을 쓰면
        quota_exempt_origins 자체에 걸려 상한이 면제되므로(규칙 기원은
