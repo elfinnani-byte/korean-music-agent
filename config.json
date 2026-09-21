@@ -1,28 +1,50 @@
 {
   "version": "1.0",
   "domain": "한국 대중음악 1992~현재",
-
   "scope": {
     "from_year": 1992,
     "note": "서태지와 아이들 데뷔 이후. 시드 기준이며 리메이크 원곡자 등은 범위 밖도 허용",
-    "eras": ["1980s 이전", "1990s", "2000s", "2010s", "2020s"],
-    "quota_eras": ["1990s", "2000s", "2010s", "2020s"]
+    "eras": [
+      "1980s 이전",
+      "1990s",
+      "2000s",
+      "2010s",
+      "2020s"
+    ],
+    "quota_eras": [
+      "1990s",
+      "2000s",
+      "2010s",
+      "2020s"
+    ]
   },
-
   "paths": {
     "docs_dir": "data/docs",
     "goldenset": "data/goldenset.json",
     "manifest": "data/manifest.json",
     "output_dir": "output"
   },
-
   "collect": {
     "seed_titles": [
-      "한국대중음악상", "골든 디스크 어워즈", "가요톱10", "엠카운트다운",
-      "서태지와 아이들", "H.O.T.", "015B", "신승훈",
-      "보아", "빅뱅 (음악 그룹)", "에픽하이",
-      "아이유", "방탄소년단", "장기하와 얼굴들", "NewJeans",
-      "SM 엔터테인먼트", "YG 엔터테인먼트", "유영진 (작곡가)", "K-pop"
+      "한국대중음악상",
+      "골든 디스크 어워즈",
+      "가요톱10",
+      "엠카운트다운",
+      "서태지와 아이들",
+      "H.O.T.",
+      "015B",
+      "신승훈",
+      "보아",
+      "빅뱅 (음악 그룹)",
+      "에픽하이",
+      "아이유",
+      "방탄소년단",
+      "장기하와 얼굴들",
+      "NewJeans",
+      "SM 엔터테인먼트",
+      "YG 엔터테인먼트",
+      "유영진 (작곡가)",
+      "K-pop"
     ],
     "target_docs": 70,
     "per_era_min": 14,
@@ -30,7 +52,11 @@
     "link_limit_per_seed": 300,
     "candidate_pool_cap": 1200,
     "request_delay_sec": 1.0,
-    "retry": {"max_attempts": 5, "backoff_base_sec": 2.0, "respect_retry_after": true},
+    "retry": {
+      "max_attempts": 5,
+      "backoff_base_sec": 2.0,
+      "respect_retry_after": true
+    },
     "user_agent": "my-graph-agent/1.0 (educational project)",
     "redirect_map": {
       "SM엔터테인먼트": "SM 엔터테인먼트",
@@ -43,12 +69,10 @@
       "유영진": "유영진 (작곡가)"
     }
   },
-
   "schema": {
     "source": "schema.py 의 REL_TRIPLES 가 단일 진실 공급원이다. 여기에 복사하지 않는다",
     "enable_program_type": true
   },
-
   "normalize": {
     "min_name_len": 2,
     "entity_type_overrides": {
@@ -62,7 +86,6 @@
       "유영진": "Artist"
     }
   },
-
   "build": {
     "max_doc_chars": 40000,
     "chunk_chars": 2400,
@@ -70,9 +93,11 @@
     "workers": 8,
     "use_cache": true,
     "extraction_version": "v1",
-    "quote_verification": {"enabled": true, "drop_on_fail": true}
+    "quote_verification": {
+      "enabled": true,
+      "drop_on_fail": true
+    }
   },
-
   "retrieval": {
     "radius": 2,
     "max_radius": 3,
@@ -82,19 +107,38 @@
     "max_seeds": 3,
     "hub_degree_threshold": 25,
     "degree_penalty_exponent": 0.5,
-    "quota_exempt_origins": ["rule", "tracklist"],
-    "quota_exempt_relations": ["INFLUENCED", "COVERED", "PRODUCED", "WROTE", "FOUNDED"],
+    "quota_exempt_origins": [
+      "rule",
+      "tracklist"
+    ],
+    "quota_exempt_relations": [
+      "INFLUENCED",
+      "COVERED",
+      "PRODUCED",
+      "WROTE",
+      "FOUNDED"
+    ],
     "bridge_min_agreement": 0.8,
-    "origin_base_score": {"rule": 1.0, "llm+rule": 1.1, "tracklist": 1.0, "derived": 0.9, "llm": 0.8},
-    "genre_hop_in_vector_route": {"allowed": true, "max_hops": 1, "penalty": 0.4, "neighbor_sample_k": 15}
+    "origin_base_score": {
+      "rule": 1.0,
+      "llm+rule": 1.1,
+      "tracklist": 1.0,
+      "derived": 0.9,
+      "llm": 0.8
+    },
+    "genre_hop_in_vector_route": {
+      "allowed": true,
+      "max_hops": 1,
+      "penalty": 0.4,
+      "neighbor_sample_k": 15
+    }
   },
-
   "gates": {
     "density": {
       "min_docs": 70,
       "min_docs_per_era": 14,
       "min_avg_cross_mentions": 3.0,
-      "min_multi_seed_ratio": 0.40,
+      "min_multi_seed_ratio": 0.4,
       "min_long_range_pairs": 10
     },
     "graph": {
@@ -102,34 +146,81 @@
       "min_bridge_edges": 20
     }
   },
-
-  "community": {"attr_weight": 0.3, "resolution": 1.0, "min_size": 4, "seed": 42},
-
+  "community": {
+    "attr_weight": 0.3,
+    "resolution": 1.0,
+    "min_size": 4,
+    "seed": 42
+  },
   "llm": {
     "profiles": {
-      "extract": {"provider": "openai", "model": "gpt-4.1-mini", "temperature": 0.0},
-      "answer": {"provider": "openai", "model": "gpt-4.1", "temperature": 0.0},
-      "judge": {"provider": "openai", "model": "gpt-4.1-mini", "temperature": 0.0}
+      "extract": {
+        "provider": "openai",
+        "model": "gpt-4.1-mini",
+        "temperature": 0.0
+      },
+      "answer": {
+        "provider": "openai",
+        "model": "gpt-4.1",
+        "temperature": 0.0
+      },
+      "judge": {
+        "provider": "openai",
+        "model": "gpt-4.1-mini",
+        "temperature": 0.0
+      }
     },
-    "env_keys": {"openai": "OPENAI_API_KEY", "google": "GOOGLE_API_KEY"},
+    "env_keys": {
+      "openai": "OPENAI_API_KEY",
+      "google": "GOOGLE_API_KEY"
+    },
     "request_timeout_sec": 90,
     "max_retries": 3
   },
-
   "eval": {
     "judge_repeats": 1,
     "sweep": {
-      "max_radius": [2, 3, 4],
-      "hub_degree_threshold": [15, 25, 40, null],
-      "per_relation": [5, 10, 20],
-      "max_triples": [100, 200, 400]
+      "max_radius": [
+        2,
+        3,
+        4
+      ],
+      "hub_degree_threshold": [
+        15,
+        25,
+        40,
+        null
+      ],
+      "per_relation": [
+        5,
+        10,
+        20
+      ],
+      "max_triples": [
+        100,
+        200,
+        400
+      ]
     },
-    "splits": {"tuned": 15, "holdout": 10},
+    "splits": {
+      "tuned": 15,
+      "holdout": 10
+    },
     "holdout": {
-      "frozen": false, "frozen_at": null, "freeze_commit": null,
-      "config_hash": null, "schema_version": null,
-      "prompt_version": null, "goldenset_hash": null, "graph_hash": null
+      "frozen": true,
+      "frozen_at": "2026-09-22T07:10:12.461826+09:00",
+      "freeze_commit": "7b5b5151940715638a8eb3675a27d10d52a79b2b",
+      "config_hash": "5fa1de53774ecfc947eb47f8df38f2b903e457e3db930e0fc0615ed9dd0a73b2",
+      "schema_version": "838583b287ed",
+      "prompt_version": "895d0f2a20da",
+      "goldenset_hash": "0391ca60801095391e2e7771506a39b5ecca3f21611ff688de65b15cfb82690a",
+      "graph_hash": "3647b287638400d6cfc5d1c982a9abae0820ffac02a604a0de2032c7837771c7"
     },
-    "baseline": {"method": "bm25", "k": 6, "chunk_chars": 800, "tokenizer": "morpheme"}
+    "baseline": {
+      "method": "bm25",
+      "k": 6,
+      "chunk_chars": 800,
+      "tokenizer": "morpheme"
+    }
   }
 }
