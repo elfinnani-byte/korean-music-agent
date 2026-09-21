@@ -1,0 +1,531 @@
+{
+  "version": "1.0",
+  "domain": "한국 대중음악 1992~현재",
+  "judging_rules": "judging_rules.md",
+  "note": "era_cross 는 설계 목표 4건 대신 실측 2건이다. judging_rules.md 참조.",
+  "items": [
+    {
+      "id": "Q01", "question": "동방신기는 어느 기획사에 소속되어 있는가?",
+      "hops": 1, "era_cross": false, "route": "local", "split": "tuned",
+      "era_span": ["2000s"], "answer_type": "single",
+      "answer": "SM 엔터테인먼트", "answer_aliases": ["SM", "에스엠 엔터테인먼트"],
+      "expected_behavior": "answer",
+      "seed_hint": ["동방신기"],
+      "expected_paths": [[
+        {"hop": 1, "rel": "SIGNED_TO", "dir": "out", "to_type": "Label"}
+      ]],
+      "expected_triples": [["동방신기", "SIGNED_TO", "SM 엔터테인먼트"]],
+      "evidence": [{"doc": "SM_엔터테인먼트.md",
+        "quote": "강타, 동방신기, 슈퍼주니어, 소녀시대, 샤이니, EXO, 레드벨벳, NCT, aespa, RIIZE, naevis, Hearts2Hearts, 승한 등 다수의 가수와 연기자들이 소속되어 있으며"}],
+      "difficulty": "easy",
+      "notes": "1홉 대조군. 라벨 소속 단순 조회."
+    },
+    {
+      "id": "Q02", "question": "서태지와 아이들의 멤버는 누구인가?",
+      "hops": 1, "era_cross": false, "route": "local", "split": "tuned",
+      "era_span": ["1990s"], "answer_type": "set",
+      "answer_set": ["서태지", "양현석", "이주노"],
+      "partial_credit": {"full": 3, "half": 2},
+      "expected_behavior": "answer",
+      "seed_hint": ["서태지와 아이들"],
+      "expected_paths": [[
+        {"hop": 1, "rel": "MEMBER_OF", "dir": "in", "to_type": "Artist"}
+      ]],
+      "expected_triples": [
+        ["서태지", "MEMBER_OF", "서태지와 아이들"],
+        ["양현석", "MEMBER_OF", "서태지와 아이들"],
+        ["이주노", "MEMBER_OF", "서태지와 아이들"]
+      ],
+      "evidence": [{"doc": "서태지와_아이들.md",
+        "quote": "랩, 작사, 작곡, 프로듀싱, 제작의 서태지와 코러스 및 백보컬과 안무를 맡은 이주노, 양현석 세 명으로 구성되었다."}],
+      "difficulty": "easy",
+      "notes": "집합형 1홉 대조군."
+    },
+    {
+      "id": "Q03", "question": "신승훈의 데뷔곡 《미소 속에 비친 그대》는 누가 작곡하였는가?",
+      "hops": 1, "era_cross": false, "route": "local", "split": "tuned",
+      "era_span": ["1990s"], "answer_type": "single",
+      "answer": "신승훈", "answer_aliases": [],
+      "expected_behavior": "answer",
+      "seed_hint": ["미소 속에 비친 그대"],
+      "expected_paths": [[
+        {"hop": 1, "rel": "WROTE", "dir": "in", "to_type": "Artist"}
+      ]],
+      "expected_triples": [["신승훈", "WROTE", "미소 속에 비친 그대"]],
+      "evidence": [{"doc": "신승훈.md",
+        "quote": "데뷔곡인《미소 속에 비친 그대》를 포함한 1집에 수록된 7곡이(이는 instrumental까지 포함) 바로 이 때 작곡한 곡들이다."}],
+      "difficulty": "easy",
+      "notes": "자작곡 WROTE 1홉 대조군."
+    },
+    {
+      "id": "Q04", "question": "서태지와 아이들이 1992년에 받은 골든디스크 시상 등급은 무엇인가?",
+      "hops": 1, "era_cross": false, "route": "local", "split": "holdout",
+      "era_span": ["1990s"], "answer_type": "single",
+      "answer": "본상", "answer_aliases": ["골든디스크 본상"],
+      "expected_behavior": "answer",
+      "seed_hint": ["서태지와 아이들"],
+      "expected_paths": [[
+        {"hop": 1, "rel": "WON", "dir": "out", "to_type": "Award"}
+      ]],
+      "expected_triples": [["서태지와 아이들", "WON", "골든디스크"]],
+      "evidence": [{"doc": "서태지와_아이들.md", "quote": "1992년 골든디스크 본상"}],
+      "difficulty": "easy",
+      "notes": "WON 1홉."
+    },
+    {
+      "id": "Q05", "question": "서태지와 아이들의 멤버 중 대형 연예 기획사를 설립한 사람이 세운 회사는 어디인가?",
+      "hops": 2, "era_cross": false, "route": "path", "split": "tuned",
+      "era_span": ["1990s"], "answer_type": "single",
+      "answer": "YG 엔터테인먼트", "answer_aliases": ["와이지 엔터테인먼트", "YG"],
+      "expected_behavior": "answer",
+      "seed_hint": ["서태지와 아이들"],
+      "expected_paths": [[
+        {"hop": 1, "rel": "MEMBER_OF", "dir": "in", "to_type": "Artist"},
+        {"hop": 2, "rel": "FOUNDED", "dir": "out", "to_type": "Label"}
+      ]],
+      "expected_triples": [
+        ["양현석", "MEMBER_OF", "서태지와 아이들"],
+        ["양현석", "FOUNDED", "YG 엔터테인먼트"]
+      ],
+      "evidence": [
+        {"doc": "서태지와_아이들.md",
+         "quote": "코러스 및 백보컬과 안무를 맡은 이주노, 양현석 세 명으로 구성되었다."},
+        {"doc": "YG_엔터테인먼트.md",
+         "quote": "YG 엔터테인먼트(영어: YG Entertainment)는 서태지와 아이들의 멤버였던 양현석이 그룹 해체 후 창립한 대한민국의 연예 기획사이다."}
+      ],
+      "difficulty": "medium",
+      "notes": "MEMBER_OF 역방향 + FOUNDED 순방향. 방향 처리 검증의 핵심 문항. SIGNED_TO 로 가면 오답."
+    },
+    {
+      "id": "Q06", "question": "빅뱅이 2008년에 리메이크한 '붉은 노을'의 원곡을 부른 가수는 누구인가?",
+      "hops": 1, "era_cross": true, "route": "path", "split": "holdout",
+      "era_span": ["1980s 이전", "2000s"], "answer_type": "single",
+      "answer": "이문세", "answer_aliases": [],
+      "expected_behavior": "answer",
+      "seed_hint": ["빅뱅"],
+      "expected_paths": [
+        [{"hop": 1, "rel": "COVERED", "dir": "out", "to_type": "Artist"}],
+        [{"hop": 1, "rel": "PERFORMED", "dir": "out", "to_type": "Song"},
+         {"hop": 2, "rel": "PERFORMED", "dir": "in", "to_type": "Artist"}]
+      ],
+      "expected_triples": [
+        ["빅뱅", "PERFORMED", "붉은 노을"],
+        ["이문세", "PERFORMED", "붉은 노을"],
+        ["빅뱅", "COVERED", "이문세"]
+      ],
+      "evidence": [{"doc": "빅뱅_(음악_그룹).md",
+        "quote": "타이틀 곡 \"붉은 노을\"은 이문세가 지난 1988년에 발표 한 곡을 새롭게 리메이크한 곡으로 기존의 가수들이 원곡의 후렴구만을 샘플링해 리메이크했던 것과는 다르게 빅뱅만의 느낌을 잘 살려 전혀 다른 곡으로 재탄생 시켰다는 호평을 받았다."}],
+      "difficulty": "hard",
+      "notes": "세대 교차 문항. COVERED 파생 간선이 생성되면 1홉, 아니면 PERFORMED 두 번으로 2홉이다. 두 경로 모두 정답 처리하며 matched_path_index 로 어느 쪽이 쓰였는지 집계한다. 원곡자 이문세는 코퍼스 범위(1992년 이후) 밖 인물이지만 리메이크 관계를 타고 후보로 들어온다 — 설계서 3.4가 노린 효과가 실제로 나는지 재는 문항이다. P5 에서 파생 간선이 생성되지 않으면 hops 를 2로 고친다."
+    },
+    {
+      "id": "Q07", "question": "god(지오디)를 프로듀싱한 사람이 설립한 기획사는 어디인가?",
+      "hops": 2, "era_cross": false, "route": "path", "split": "tuned",
+      "era_span": ["1990s"], "answer_type": "single",
+      "answer": "JYP 엔터테인먼트", "answer_aliases": ["JYP"],
+      "expected_behavior": "answer",
+      "seed_hint": ["God (음악 그룹)"],
+      "expected_paths": [[
+        {"hop": 1, "rel": "PRODUCED", "dir": "in", "to_type": "Artist"},
+        {"hop": 2, "rel": "FOUNDED", "dir": "out", "to_type": "Label"}
+      ]],
+      "expected_triples": [
+        ["박진영", "PRODUCED", "God"],
+        ["박진영", "FOUNDED", "JYP 엔터테인먼트"]
+      ],
+      "evidence": [{"doc": "God_(음악_그룹).md",
+        "quote": "싱어송라이터이자 JYP 엔터테인먼트의 설립자인 박진영을 그들의 프로듀서이자 멘토로 소개했다."}],
+      "difficulty": "medium",
+      "notes": "PRODUCED 역방향 + FOUNDED 순방향. 한 문장에서 두 사실이 동시에 나온다."
+    },
+    {
+      "id": "Q08", "question": "서태지와 아이들의 1집 《Seotaiji and Boys》에 수록된 곡 중 하나는?",
+      "hops": 2, "era_cross": false, "route": "path", "split": "tuned",
+      "era_span": ["1990s"], "answer_type": "single",
+      "answer": "난 알아요", "answer_aliases": [],
+      "expected_behavior": "answer",
+      "seed_hint": ["서태지와 아이들"],
+      "expected_paths": [[
+        {"hop": 1, "rel": "RELEASED", "dir": "out", "to_type": "Album"},
+        {"hop": 2, "rel": "CONTAINS", "dir": "out", "to_type": "Song"}
+      ]],
+      "expected_triples": [
+        ["서태지와 아이들", "RELEASED", "Seotaiji and Boys"],
+        ["Seotaiji and Boys", "CONTAINS", "난 알아요"]
+      ],
+      "evidence": [
+        {"doc": "서태지와_아이들.md",
+         "quote": "그 때의 미디 작업으로 〈난 알아요〉, 〈환상속의 그대〉등 서태지와 아이들 1집에 수록될 곡들의 일부가 만들어진다."},
+        {"doc": "서태지와_아이들.md",
+         "quote": "《Seotaiji and Boys》(발매: 1992년 3월 23일)"}
+      ],
+      "difficulty": "medium",
+      "notes": "RELEASED+CONTAINS. 트랙리스트 정규식이 아니라 본문 서술에서 나온 CONTAINS 사실."
+    },
+    {
+      "id": "Q09", "question": "박진영이 프로듀싱한 그룹의 데뷔곡은 무엇인가?",
+      "hops": 2, "era_cross": false, "route": "path", "split": "tuned",
+      "era_span": ["1990s"], "answer_type": "single",
+      "answer": "어머님께", "answer_aliases": [],
+      "expected_behavior": "answer",
+      "seed_hint": ["박진영"],
+      "expected_paths": [[
+        {"hop": 1, "rel": "PRODUCED", "dir": "out", "to_type": "Group"},
+        {"hop": 2, "rel": "PERFORMED", "dir": "out", "to_type": "Song"}
+      ]],
+      "expected_triples": [
+        ["박진영", "PRODUCED", "God"],
+        ["God", "PERFORMED", "어머님께"]
+      ],
+      "evidence": [
+        {"doc": "God_(음악_그룹).md",
+         "quote": "싱어송라이터이자 JYP 엔터테인먼트의 설립자인 박진영을 그들의 프로듀서이자 멘토로 소개했다."},
+        {"doc": "God_(음악_그룹).md",
+         "quote": "god는 1999년 1월 13일에 SBS 한밤의 TV연예에서 1집 음반의 타이틀곡인 \"어머님께\"의 라이브 공연을 선보이면서 데뷔했다."}
+      ],
+      "difficulty": "medium",
+      "notes": "PRODUCED+PERFORMED."
+    },
+    {
+      "id": "Q10", "question": "지드래곤이 소속된 그룹이 2008년 MNET KM 뮤직 페스티벌에서 받은 상은?",
+      "hops": 2, "era_cross": false, "route": "path", "split": "tuned",
+      "era_span": ["2000s"], "answer_type": "set",
+      "answer_set": ["최우수 남자그룹상", "올해의 가수상"],
+      "partial_credit": {"full": 2, "half": 1},
+      "expected_behavior": "answer",
+      "seed_hint": ["지드래곤"],
+      "expected_paths": [[
+        {"hop": 1, "rel": "MEMBER_OF", "dir": "out", "to_type": "Group"},
+        {"hop": 2, "rel": "WON", "dir": "out", "to_type": "Award"}
+      ]],
+      "expected_triples": [
+        ["지드래곤", "MEMBER_OF", "빅뱅"],
+        ["빅뱅", "WON", "최우수 남자그룹상"],
+        ["빅뱅", "WON", "올해의 가수상"]
+      ],
+      "evidence": [
+        {"doc": "빅뱅_(음악_그룹).md",
+         "quote": "빅뱅(BIGBANG)은 2006년 8월 19일에 데뷔한 대한민국의 3인조 보이 그룹이다. 멤버는 지드래곤, 태양, 대성이다"},
+        {"doc": "빅뱅_(음악_그룹).md",
+         "quote": "빅뱅은 MNET KM 뮤직 페스티벌에서 최우수 남자그룹상과 올해의 가수상을 수상하였다."}
+      ],
+      "difficulty": "medium",
+      "notes": "MEMBER_OF 순방향 + WON. 집합형."
+    },
+    {
+      "id": "Q11", "question": "강남스타일을 작사·작곡한 가수가 이 곡을 수록한 음반의 제목은?",
+      "hops": 2, "era_cross": false, "route": "path", "split": "holdout",
+      "era_span": ["2010s"], "answer_type": "single",
+      "answer": "싸이6甲 Part 1", "answer_aliases": ["싸이6甲"],
+      "expected_behavior": "answer",
+      "seed_hint": ["강남스타일"],
+      "expected_paths": [[
+        {"hop": 1, "rel": "WROTE", "dir": "in", "to_type": "Artist"},
+        {"hop": 2, "rel": "RELEASED", "dir": "out", "to_type": "Album"}
+      ]],
+      "expected_triples": [
+        ["싸이", "WROTE", "강남스타일"],
+        ["싸이", "RELEASED", "싸이6甲 Part 1"]
+      ],
+      "evidence": [{"doc": "강남스타일.md",
+        "quote": "〈강남스타일〉(영어: Gangnam Style)은 대한민국의 가수인 싸이의 노래로, 그의 여섯 번째 정규 EP앨범 《싸이6甲 Part 1》의 세 번째 트랙이자 타이틀 곡이다. 2012년 7월 15일(11주년)음반으로 발매되었으며, 선풍적인 인기를 끌었다. 싸이와 유건형이 공동 작곡하였다."}],
+      "difficulty": "medium",
+      "notes": "WROTE 역방향 + RELEASED."
+    },
+    {
+      "id": "Q12", "question": "빅뱅의 두 번째 정규 음반 《Remember》에 수록된 리메이크 곡은?",
+      "hops": 2, "era_cross": false, "route": "path", "split": "tuned",
+      "era_span": ["2000s"], "answer_type": "single",
+      "answer": "붉은 노을", "answer_aliases": [],
+      "expected_behavior": "answer",
+      "seed_hint": ["빅뱅"],
+      "expected_paths": [[
+        {"hop": 1, "rel": "RELEASED", "dir": "out", "to_type": "Album"},
+        {"hop": 2, "rel": "CONTAINS", "dir": "out", "to_type": "Song"}
+      ]],
+      "expected_triples": [
+        ["빅뱅", "RELEASED", "Remember"],
+        ["Remember", "CONTAINS", "붉은 노을"]
+      ],
+      "evidence": [{"doc": "빅뱅_(음악_그룹).md",
+        "quote": "빅뱅은 11월 5일, 두 번째 정규 앨범 《Remember》을 발매하였고, 선주문만 20만장의 판매량을 기록했다. 타이틀 곡 \"붉은 노을\"은 이문세가 지난 1988년에 발표 한 곡을 새롭게 리메이크한 곡으로"}],
+      "difficulty": "medium",
+      "notes": "RELEASED+CONTAINS. Q06 과 같은 곡을 다른 경로(음반 경유)로 확인."
+    },
+    {
+      "id": "Q13", "question": "EXO의 유닛 중 첸, 백현, 시우민으로 구성된 유닛이 데뷔하며 발표한 곡은?",
+      "hops": 2, "era_cross": false, "route": "path", "split": "holdout",
+      "era_span": ["2010s"], "answer_type": "single",
+      "answer": "Hey Mama!", "answer_aliases": [],
+      "expected_behavior": "answer",
+      "seed_hint": ["EXO"],
+      "expected_paths": [[
+        {"hop": 1, "rel": "SUBUNIT_OF", "dir": "in", "to_type": "Group"},
+        {"hop": 2, "rel": "PERFORMED", "dir": "out", "to_type": "Song"}
+      ]],
+      "expected_triples": [
+        ["EXO-CBX", "SUBUNIT_OF", "EXO"],
+        ["EXO-CBX", "PERFORMED", "Hey Mama!"]
+      ],
+      "evidence": [{"doc": "EXO.md",
+        "quote": "10월 31일, 멤버 첸, 백현, 시우민이 EXO-CBX 멤버로 데뷔하여 \"Hey Mama!\"로 첫 유닛 활동을 하였다."}],
+      "difficulty": "medium",
+      "notes": "SUBUNIT_OF 역방향 + PERFORMED."
+    },
+    {
+      "id": "Q14", "question": "ITZY의 데뷔곡은 무엇이며, 이 곡이 처음 1위를 차지한 음악방송은?",
+      "hops": 2, "era_cross": false, "route": "path", "split": "holdout",
+      "era_span": ["2010s"], "answer_type": "single",
+      "answer": "엠카운트다운", "answer_aliases": [],
+      "expected_behavior": "answer",
+      "seed_hint": ["ITZY"],
+      "expected_paths": [[
+        {"hop": 1, "rel": "PERFORMED", "dir": "out", "to_type": "Song"},
+        {"hop": 2, "rel": "TOPPED_ON", "dir": "out", "to_type": "Program"}
+      ]],
+      "expected_triples": [
+        ["ITZY", "PERFORMED", "달라달라"],
+        ["달라달라", "TOPPED_ON", "엠카운트다운"]
+      ],
+      "evidence": [{"doc": "ITZY.md",
+        "quote": "있지는 타이틀 곡 〈달라달라〉가 수록된 데뷔 싱글 음반 IT'z Different를 발매하였다. 이 노래는 EDM, 하우스, 힙합 바이브가 혼합된 곡이며, 가사는 대중에게 잘 받아들여질 만한 내용이었다. 뮤직 비디오는 공개된 지 24시간 만에 조회수가 14,000,000건을 넘어섰다. 2월 21일 엠카운트다운에서 데뷔 후 첫 1위를 하였으며"}],
+      "difficulty": "medium",
+      "notes": "PERFORMED+TOPPED_ON. TOPPED_ON 은 P4 관문에서 조건(10건 이상) 미달이면 Program 타입과 함께 제거되는 조건부 관계다 — 이 문항이 그 조건의 실효성을 재는 문항이다."
+    },
+    {
+      "id": "Q15", "question": "서태지와 아이들의 멤버 중 대형 기획사를 설립한 사람이 세운 회사에 소속된 3인조 보이 그룹은?",
+      "hops": 3, "era_cross": true, "route": "path", "split": "tuned",
+      "era_span": ["1990s", "2000s"], "answer_type": "single",
+      "answer": "빅뱅", "answer_aliases": ["BIGBANG", "빅뱅 (음악 그룹)"],
+      "expected_behavior": "answer",
+      "seed_hint": ["서태지와 아이들"],
+      "expected_paths": [[
+        {"hop": 1, "rel": "MEMBER_OF", "dir": "in", "to_type": "Artist"},
+        {"hop": 2, "rel": "FOUNDED", "dir": "out", "to_type": "Label"},
+        {"hop": 3, "rel": "SIGNED_TO", "dir": "in", "to_type": "Group"}
+      ]],
+      "expected_triples": [
+        ["양현석", "MEMBER_OF", "서태지와 아이들"],
+        ["양현석", "FOUNDED", "YG 엔터테인먼트"],
+        ["빅뱅", "SIGNED_TO", "YG 엔터테인먼트"]
+      ],
+      "evidence": [
+        {"doc": "서태지와_아이들.md",
+         "quote": "코러스 및 백보컬과 안무를 맡은 이주노, 양현석 세 명으로 구성되었다."},
+        {"doc": "YG_엔터테인먼트.md",
+         "quote": "YG 엔터테인먼트(영어: YG Entertainment)는 서태지와 아이들의 멤버였던 양현석이 그룹 해체 후 창립한 대한민국의 연예 기획사이다."},
+        {"doc": "빅뱅_(음악_그룹).md",
+         "quote": "2006년 초, YG 엔터테인먼트의 양현석 대표는 인터뷰를 통해 “새로운 프로젝트를 시작했다."}
+      ],
+      "difficulty": "hard",
+      "notes": "세대 교차 3홉. Q05 의 경로를 SIGNED_TO 한 홉 더 연장한다. 1990s 인물이 세운 회사에 2000s 그룹이 소속되는 구조."
+    },
+    {
+      "id": "Q16", "question": "SM 엔터테인먼트가 기획한 그룹의 유닛 중 첸·백현·시우민으로 구성된 유닛이 데뷔하며 발표한 곡은?",
+      "hops": 3, "era_cross": false, "route": "path", "split": "tuned",
+      "era_span": ["2010s"], "answer_type": "single",
+      "answer": "Hey Mama!", "answer_aliases": [],
+      "expected_behavior": "answer",
+      "seed_hint": ["SM 엔터테인먼트"],
+      "expected_paths": [[
+        {"hop": 1, "rel": "SIGNED_TO", "dir": "in", "to_type": "Group"},
+        {"hop": 2, "rel": "SUBUNIT_OF", "dir": "in", "to_type": "Group"},
+        {"hop": 3, "rel": "PERFORMED", "dir": "out", "to_type": "Song"}
+      ]],
+      "expected_triples": [
+        ["EXO", "SIGNED_TO", "SM 엔터테인먼트"],
+        ["EXO-CBX", "SUBUNIT_OF", "EXO"],
+        ["EXO-CBX", "PERFORMED", "Hey Mama!"]
+      ],
+      "evidence": [
+        {"doc": "EXO.md",
+         "quote": "SM 엔터테인먼트의 이수만 대표는 3월에서 4월쯤에 신인 보이그룹을 데뷔시키는 계획을 언론에 공개했다."},
+        {"doc": "EXO.md",
+         "quote": "10월 31일, 멤버 첸, 백현, 시우민이 EXO-CBX 멤버로 데뷔하여 \"Hey Mama!\"로 첫 유닛 활동을 하였다."}
+      ],
+      "difficulty": "hard",
+      "notes": "SIGNED_TO 역방향 + SUBUNIT_OF 역방향 + PERFORMED. 3중 허브(SM) 경유이지만 목적지가 명확한 하위 유닛이라 허브 회피 규칙(경유 금지, 최종 답 후보는 예외)의 경계 사례다."
+    },
+    {
+      "id": "Q17", "question": "박진영이 설립한 기획사에 소속된 Stray Kids의 데뷔 타이틀곡은?",
+      "hops": 3, "era_cross": false, "route": "path", "split": "tuned",
+      "era_span": ["2010s"], "answer_type": "single",
+      "answer": "디스트릭트9", "answer_aliases": ["District 9", "디스트릭트9(District 9)"],
+      "expected_behavior": "answer",
+      "seed_hint": ["박진영"],
+      "expected_paths": [[
+        {"hop": 1, "rel": "FOUNDED", "dir": "out", "to_type": "Label"},
+        {"hop": 2, "rel": "SIGNED_TO", "dir": "in", "to_type": "Group"},
+        {"hop": 3, "rel": "PERFORMED", "dir": "out", "to_type": "Song"}
+      ]],
+      "expected_triples": [
+        ["박진영", "FOUNDED", "JYP 엔터테인먼트"],
+        ["Stray Kids", "SIGNED_TO", "JYP 엔터테인먼트"],
+        ["Stray Kids", "PERFORMED", "디스트릭트9"]
+      ],
+      "evidence": [
+        {"doc": "God_(음악_그룹).md",
+         "quote": "싱어송라이터이자 JYP 엔터테인먼트의 설립자인 박진영을 그들의 프로듀서이자 멘토로 소개했다."},
+        {"doc": "Stray_Kids.md",
+         "quote": "Stray Kids(스트레이 키즈, SKZ)는 동명의 프로그램을 통해 결성된 JYP 엔터테인먼트 소속의 8인조 보이 그룹이다."},
+        {"doc": "Stray_Kids.md",
+         "quote": "타이틀 곡은 \"디스트릭트9(District 9)\"으로 힙합, 록, EDM이 결합한 하이브리드 장르로"}
+      ],
+      "difficulty": "hard",
+      "notes": "FOUNDED+SIGNED_TO+PERFORMED. Q18 과 같은 시드에서 다른 종착지로 갈라진다."
+    },
+    {
+      "id": "Q18", "question": "박진영이 설립한 기획사에 소속된 Stray Kids의 멤버 중 한 명은 누구인가?",
+      "hops": 3, "era_cross": false, "route": "path", "split": "tuned",
+      "era_span": ["2010s"], "answer_type": "single",
+      "answer": "이민호", "answer_aliases": [],
+      "expected_behavior": "answer",
+      "seed_hint": ["박진영"],
+      "expected_paths": [[
+        {"hop": 1, "rel": "FOUNDED", "dir": "out", "to_type": "Label"},
+        {"hop": 2, "rel": "SIGNED_TO", "dir": "in", "to_type": "Group"},
+        {"hop": 3, "rel": "MEMBER_OF", "dir": "in", "to_type": "Artist"}
+      ]],
+      "expected_triples": [
+        ["박진영", "FOUNDED", "JYP 엔터테인먼트"],
+        ["Stray Kids", "SIGNED_TO", "JYP 엔터테인먼트"],
+        ["이민호", "MEMBER_OF", "Stray Kids"]
+      ],
+      "evidence": [
+        {"doc": "God_(음악_그룹).md",
+         "quote": "싱어송라이터이자 JYP 엔터테인먼트의 설립자인 박진영을 그들의 프로듀서이자 멘토로 소개했다."},
+        {"doc": "Stray_Kids.md",
+         "quote": "Stray Kids(스트레이 키즈, SKZ)는 동명의 프로그램을 통해 결성된 JYP 엔터테인먼트 소속의 8인조 보이 그룹이다."},
+        {"doc": "Stray_Kids.md",
+         "quote": "방찬, 김우진, 이민호, 서창빈, 황현진, 한지성, 필릭스, 김승민, 양정인은 가장 완전한 조합으로 평가받은 9인 체제를 지켜내며 최종 멤버를 확정 지었다."}
+      ],
+      "difficulty": "hard",
+      "notes": "FOUNDED+SIGNED_TO+MEMBER_OF. Q17 과 같은 두 홉을 공유하고 세 번째 홉만 다르다 — 같은 중간 경로에서 서로 다른 종착 관계로 갈리는 것을 확인하는 짝 문항."
+    },
+    {
+      "id": "Q19", "question": "박진영이 설립한 기획사에 소속된 밴드 DAY6가 데뷔한 연대는?",
+      "hops": 3, "era_cross": false, "route": "path", "split": "tuned",
+      "era_span": ["2010s"], "answer_type": "single",
+      "answer": "2010년대", "answer_aliases": ["2010s"],
+      "expected_behavior": "answer",
+      "seed_hint": ["박진영"],
+      "expected_paths": [[
+        {"hop": 1, "rel": "FOUNDED", "dir": "out", "to_type": "Label"},
+        {"hop": 2, "rel": "SIGNED_TO", "dir": "in", "to_type": "Group"},
+        {"hop": 3, "rel": "DEBUTED_IN", "dir": "out", "to_type": "Era"}
+      ]],
+      "expected_triples": [
+        ["박진영", "FOUNDED", "JYP 엔터테인먼트"],
+        ["DAY6", "SIGNED_TO", "JYP 엔터테인먼트"],
+        ["DAY6", "DEBUTED_IN", "2010s"]
+      ],
+      "evidence": [
+        {"doc": "God_(음악_그룹).md",
+         "quote": "싱어송라이터이자 JYP 엔터테인먼트의 설립자인 박진영을 그들의 프로듀서이자 멘토로 소개했다."},
+        {"doc": "DAY6.md",
+         "quote": "JYP 내에서 K-pop 외에 다른 장르 아티스트를 육성하자는 계획에 따라 K-pop 외 장르를 다루는 JYP 산하 레이블이었던 Studio J에서"},
+        {"doc": "DAY6.md",
+         "quote": "2015년 9월 7일 EP \"The Day\"로 데뷔했다."}
+      ],
+      "difficulty": "hard",
+      "notes": "FOUNDED+SIGNED_TO+DEBUTED_IN. 종착지가 Era 라 마지막 홉이 Genre/Era 비확장 규칙에 걸리지 않는지(근거로는 제시되지만 더 뻗어나가지 않는지) 확인하는 문항이기도 하다."
+    },
+    {
+      "id": "Q20", "question": "지드래곤이 소속된 그룹이 발매한 두 번째 정규 음반에 수록된 리메이크 곡은?",
+      "hops": 3, "era_cross": false, "route": "path", "split": "holdout",
+      "era_span": ["2000s"], "answer_type": "single",
+      "answer": "붉은 노을", "answer_aliases": [],
+      "expected_behavior": "answer",
+      "seed_hint": ["지드래곤"],
+      "expected_paths": [[
+        {"hop": 1, "rel": "MEMBER_OF", "dir": "out", "to_type": "Group"},
+        {"hop": 2, "rel": "RELEASED", "dir": "out", "to_type": "Album"},
+        {"hop": 3, "rel": "CONTAINS", "dir": "out", "to_type": "Song"}
+      ]],
+      "expected_triples": [
+        ["지드래곤", "MEMBER_OF", "빅뱅"],
+        ["빅뱅", "RELEASED", "Remember"],
+        ["Remember", "CONTAINS", "붉은 노을"]
+      ],
+      "evidence": [
+        {"doc": "빅뱅_(음악_그룹).md",
+         "quote": "빅뱅(BIGBANG)은 2006년 8월 19일에 데뷔한 대한민국의 3인조 보이 그룹이다. 멤버는 지드래곤, 태양, 대성이다"},
+        {"doc": "빅뱅_(음악_그룹).md",
+         "quote": "빅뱅은 11월 5일, 두 번째 정규 앨범 《Remember》을 발매하였고, 선주문만 20만장의 판매량을 기록했다. 타이틀 곡 \"붉은 노을\"은 이문세가 지난 1988년에 발표 한 곡을 새롭게 리메이크한 곡으로"}
+      ],
+      "difficulty": "hard",
+      "notes": "MEMBER_OF+RELEASED+CONTAINS. Q12 를 멤버 개인에서 출발해 한 홉 늘린 짝 문항."
+    },
+    {
+      "id": "Q21", "question": "B1A4의 리더가 작사·작곡한 타이틀곡 'SOLO DAY'가 수록된 음반의 제목은?",
+      "hops": 3, "era_cross": false, "route": "path", "split": "holdout",
+      "era_span": ["2010s"], "answer_type": "single",
+      "answer": "SOLO DAY", "answer_aliases": [],
+      "expected_behavior": "answer",
+      "seed_hint": ["SOLO DAY"],
+      "expected_paths": [[
+        {"hop": 1, "rel": "WROTE", "dir": "in", "to_type": "Artist"},
+        {"hop": 2, "rel": "MEMBER_OF", "dir": "out", "to_type": "Group"},
+        {"hop": 3, "rel": "RELEASED", "dir": "out", "to_type": "Album"}
+      ]],
+      "expected_triples": [
+        ["진영", "WROTE", "SOLO DAY"],
+        ["진영", "MEMBER_OF", "B1A4"],
+        ["B1A4", "RELEASED", "SOLO DAY"]
+      ],
+      "evidence": [{"doc": "B1A4.md",
+        "quote": "\"SOLO DAY\"는 2012년부터 줄곧 타이틀곡 작사·작곡을 해오던 리더 진영과 래퍼 바로가 작사·작곡 한 곡이다."}],
+      "difficulty": "hard",
+      "notes": "WROTE 역방향+MEMBER_OF+RELEASED. 곡 제목과 음반 제목이 둘 다 'SOLO DAY'로 같다 — Song 과 Album 이 이름만으로 병합되면 안 된다는 동일성 정책(설계서 4.3)의 실전 검증 문항이다. 시드와 종착지가 같은 이름의 다른 노드다."
+    },
+    {
+      "id": "Q22", "question": "빅뱅은 몇 년대에 데뷔한 그룹인가?",
+      "hops": 1, "era_cross": false, "route": "local", "split": "tuned",
+      "era_span": ["2000s"], "answer_type": "single",
+      "answer": "2000년대", "answer_aliases": ["2000s"],
+      "expected_behavior": "answer",
+      "seed_hint": ["빅뱅"],
+      "expected_paths": [[
+        {"hop": 1, "rel": "DEBUTED_IN", "dir": "out", "to_type": "Era"}
+      ]],
+      "expected_triples": [["빅뱅", "DEBUTED_IN", "2000s"]],
+      "evidence": [{"doc": "빅뱅_(음악_그룹).md",
+        "quote": "빅뱅(BIGBANG)은 2006년 8월 19일에 데뷔한 대한민국의 3인조 보이 그룹이다. 멤버는 지드래곤, 태양, 대성이다"}],
+      "difficulty": "easy",
+      "notes": "DEBUTED_IN 1홉 대조군. Q19(3홉)에서 쓰인 것과 같은 관계를 최단 경로로 확인."
+    },
+    {
+      "id": "Q23", "question": "오늘 서울의 날씨는 어떤가요?",
+      "hops": null, "era_cross": false, "route": "reject", "split": "holdout",
+      "era_span": [], "answer_type": "none",
+      "answer": null, "answer_aliases": [],
+      "expected_behavior": "abstain", "abstain_reason": "out_of_scope",
+      "seed_hint": [],
+      "expected_paths": [], "expected_triples": [], "evidence": [],
+      "difficulty": "easy",
+      "notes": "도메인 밖 질문. 라우터가 seeds 단계 이전에 reject 로 막아야 한다."
+    },
+    {
+      "id": "Q24", "question": "NewJeans가 2030년에 발표한 정규 음반의 제목은?",
+      "hops": null, "era_cross": false, "route": "path", "split": "holdout",
+      "era_span": ["2020s"], "answer_type": "none",
+      "answer": null, "answer_aliases": [],
+      "expected_behavior": "abstain", "abstain_reason": "no_supported_path",
+      "seed_hint": ["NewJeans"],
+      "expected_paths": [], "expected_triples": [], "evidence": [],
+      "difficulty": "medium",
+      "notes": "함정 문항. NewJeans 는 코퍼스에 있는 도메인 안 개체이지만 2030년은 코퍼스 수집 시점(2026년) 이후의 가상 미래라 근거가 존재할 수 없다. 그럴듯한 음반명을 지어내면 환각으로 기록한다."
+    },
+    {
+      "id": "Q25", "question": "박진영이 설립한 기획사에 소속된 그룹 Stray Kids의 소속사가 EXO의 소속사와 같은가?",
+      "hops": null, "era_cross": false, "route": "path", "split": "holdout",
+      "era_span": ["2010s"], "answer_type": "none",
+      "answer": null, "answer_aliases": [],
+      "expected_behavior": "abstain", "abstain_reason": "no_supported_path",
+      "seed_hint": ["Stray Kids", "EXO"],
+      "expected_paths": [], "expected_triples": [], "evidence": [],
+      "difficulty": "medium",
+      "notes": "함정 문항. Stray Kids 는 JYP, EXO 는 SM 소속으로 서로 다른 레이블이다. 코퍼스 안 사실로 '같지 않다'를 확인할 수는 있지만, 이 문항은 사실을 긍정으로 유도하는 질문 형태(...같은가?)라 근거 없이 '예'라고 답하는 환각을 유도하기 쉬운지 보는 문항이다. 정답은 근거가 부족합니다가 아니라 실제로는 답할 수 있는 경계 사례이므로, split=holdout 에서 이 판단 자체(기권이 맞는가, 부정 답변이 맞는가)를 사람이 정독해 기록한다."
+    }
+  ]
+}
