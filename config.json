@@ -117,7 +117,7 @@
   },
 
   "eval": {
-    "judge_repeats": 3,
+    "judge_repeats": 1,
     "sweep": {
       "max_radius": [2, 3, 4],
       "hub_degree_threshold": [15, 25, 40, null],
