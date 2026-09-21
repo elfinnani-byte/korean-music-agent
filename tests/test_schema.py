@@ -45,3 +45,20 @@ def test_formed_in_is_separate_from_debuted_in():
 def test_never_merge_pairs_block_same_family_collisions():
     assert frozenset({"Artist", "Group"}) in schema.NEVER_MERGE_PAIRS
     assert frozenset({"Album", "Song"}) in schema.NEVER_MERGE_PAIRS
+
+
+def test_genre_canon_maps_variants_to_one_form():
+    assert schema.GENRE_CANON["락"] == "록"
+    assert schema.GENRE_CANON["알앤비"] == "리듬 앤 블루스"
+    assert schema.GENRE_CANON["케이팝"] == "K-pop"
+
+
+def test_extraction_instructions_mention_quote_requirement():
+    """설계서 4.2 — quote 는 프롬프트에만 있으면 안 되고 코드가 검증하지만,
+       프롬프트에도 반드시 있어야 모델이 quote 를 내놓는다."""
+    assert "quote" in schema.EXTRACTION_INSTRUCTIONS
+
+
+def test_extraction_instructions_do_not_mention_absent_relations():
+    """스키마에 없는 관계를 암시하는 낱말을 넣으면 모델이 엉뚱한 타입으로 흘린다."""
+    assert "출연" not in schema.EXTRACTION_INSTRUCTIONS
