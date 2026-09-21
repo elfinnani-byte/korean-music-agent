@@ -47,7 +47,6 @@ def is_junk(name: str, ntype: str) -> bool:
 
 
 RULE_VOTE_WEIGHT = 5
-CONTEXT_TYPES = {"Song", "Album"}
 TYPE_ORDER = {t: i for i, t in enumerate(schema.NODE_TYPES)}
 
 
@@ -68,13 +67,19 @@ def vote_type(llm_votes: dict[str, int], rule_votes: dict[str, int]) -> str:
     return sorted(pool, key=lambda t: TYPE_ORDER.get(t, 99))[0]
 
 
-def node_id(name: str, ntype: str, context: str | None) -> str:
-    """Song·Album 은 제목만으로 동일성이 서지 않는다(설계서 4.3).
-       맥락(대표 수행자 또는 수록 앨범)을 ID 에 넣어 동명이곡을 가른다."""
-    key = norm_key(name)
-    if ntype in CONTEXT_TYPES:
-        return f"{ntype.lower()}:{key}:{norm_key(context) if context else '_'}"
-    return f"{ntype.lower()}:{key}"
+def node_id(name: str, ntype: str) -> str:
+    """제목·타입만으로 동일성을 정한다. Song·Album 은 원래 수행자·
+       수록앨범 맥락을 ID 에 넣어 동명이곡을 가르려 했으나(설계서 4.3
+       초안), 실제 파이프라인에서는 같은 곡이 WROTE(작사가) ·
+       PERFORMED(가수) · RELEASED(음반) 등 서로 다른 관계를 통해
+       언급될 때마다 맥락이 달라져 같은 곡이 여러 노드로 쪼개졌다
+       (실측: '강남스타일' 하나가 4개 노드로 분열, COVERED 파생도
+       무력화됨). 실제 코퍼스에 동명이곡 충돌 증거가 없고, Song·Album은
+       타입 접두사(song:/album:)로 이미 다른 타입과 충돌하지 않으므로
+       제목만으로 합치도록 되돌린다. 이후 실제 동명이곡 충돌이
+       발견되면 can_merge_songs() 로 수동 검증 후 config 에 예외를
+       고정한다."""
+    return f"{ntype.lower()}:{norm_key(name)}"
 
 
 def can_merge_songs(a: dict, b: dict) -> bool:
@@ -125,17 +130,6 @@ def _relation_implied_types() -> dict[tuple[str, str], str]:
 RELATION_IMPLIED_TYPES = _relation_implied_types()
 
 
-def _context_of(triple: dict, side: str) -> str | None:
-    """Song·Album 노드의 맥락을 삼중항에서 유추한다."""
-    if side == "t" and triple["r"] in ("PERFORMED", "RELEASED", "WROTE", "PRODUCED"):
-        return triple["h"]
-    if side == "t" and triple["r"] == "CONTAINS":
-        return triple["h"]
-    if side == "h" and triple["r"] == "CONTAINS":
-        return None
-    return None
-
-
 def merge_triples(triples: list[dict], cfg: dict,
                   types: dict[str, str]) -> tuple[nx.MultiDiGraph, dict]:
     """삼중항을 그래프로 합친다. 정규화는 규칙·트랙리스트·LLM 을
@@ -150,7 +144,7 @@ def merge_triples(triples: list[dict], cfg: dict,
         if ntype is None or is_junk(name, ntype):
             report["dropped_junk"].append(name)
             return None
-        nid = node_id(name, ntype, _context_of(triple, side))
+        nid = node_id(name, ntype)
         if nid not in g:
             g.add_node(nid, name=clean_name(name), type=ntype,
                        norm=norm_key(name), aliases=[])
@@ -214,23 +208,29 @@ def add_derived_edges(g: nx.MultiDiGraph) -> nx.MultiDiGraph:
 
        LABELMATE_OF 는 의도적으로 만들지 않는다."""
     by_song: dict[str, dict[str, list[str]]] = {}
+    # 같은 곡의 원곡 PERFORMED 와 리메이크 PERFORMED 를 정확한 노드 ID로
+    # 묶으면 안 된다. node_id() 의 Song 맥락이 '이 삼중항의 수행자'라서
+    # 원곡자와 리메이크 가수가 서로 다른 맥락을 낳고, 같은 제목의 곡이
+    # song:제목:원곡자 / song:제목:리메이크가수 두 노드로 쪼개진다
+    # (실측: 52건 코퍼스에서 이 경로로 COVERED 가 0건이었다). 정규화된
+    # 제목(norm)으로 묶어야 노드가 쪼개져 있어도 같은 곡으로 본다.
     for u, v, data in g.edges(data=True):
         if data["relation"] != "PERFORMED":
             continue
-        bucket = by_song.setdefault(v, {"orig": [], "cover": []})
+        title = g.nodes[v]["norm"]
+        bucket = by_song.setdefault(title, {"orig": [], "cover": [], "name": g.nodes[v]["name"]})
         is_cover = bool(data.get("props", {}).get("cover"))
         bucket["cover" if is_cover else "orig"].append(u)
 
-    for song, sides in by_song.items():
+    for title, sides in by_song.items():
         for coverer in sides["cover"]:
             for original in sides["orig"]:
                 if coverer == original:
                     continue
                 g.add_edge(coverer, original, relation="COVERED",
-                           props={"via_song": g.nodes[song]["name"]},
+                           props={"via_song": sides["name"]},
                            origins=["derived"], agreement=0.8, count=1,
-                           sources=list({*g.nodes[song].get("aliases", []),
-                                         g.nodes[song]["name"]}),
+                           sources=[sides["name"]],
                            quotes=[])
     return g
 

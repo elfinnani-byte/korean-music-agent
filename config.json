@@ -64,7 +64,7 @@
   },
 
   "build": {
-    "max_doc_chars": 6000,
+    "max_doc_chars": 40000,
     "chunk_chars": 2400,
     "chunk_overlap": 200,
     "workers": 8,

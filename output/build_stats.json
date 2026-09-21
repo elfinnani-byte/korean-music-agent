@@ -1,46 +1,48 @@
 {
   "docs": 52,
-  "nodes": 1468,
-  "edges": 1589,
+  "nodes": 1683,
+  "edges": 2402,
   "edges_by_relation": {
-    "FORMED_IN": 45,
-    "DEBUTED_IN": 61,
-    "WON": 118,
-    "COLLABORATED_WITH": 20,
-    "SIGNED_TO": 108,
-    "RELEASED": 371,
-    "PERFORMED": 307,
-    "HAS_GENRE": 36,
-    "RELEASED_IN": 284,
-    "INFLUENCED": 4,
-    "CONTAINS": 103,
-    "SUBUNIT_OF": 1,
-    "MEMBER_OF": 85,
-    "WROTE": 21,
-    "PRODUCED": 1,
-    "FOUNDED": 6,
-    "TOPPED_ON": 18
+    "FORMED_IN": 53,
+    "DEBUTED_IN": 84,
+    "WON": 171,
+    "COLLABORATED_WITH": 27,
+    "SIGNED_TO": 160,
+    "RELEASED": 470,
+    "PERFORMED": 548,
+    "HAS_GENRE": 73,
+    "RELEASED_IN": 415,
+    "COVERED": 6,
+    "INFLUENCED": 54,
+    "CONTAINS": 112,
+    "SUBUNIT_OF": 8,
+    "WROTE": 30,
+    "MEMBER_OF": 156,
+    "TOPPED_ON": 25,
+    "PRODUCED": 2,
+    "FOUNDED": 8
   },
   "edges_by_origin": {
-    "llm+rule": 43,
-    "llm": 1444,
-    "rule": 102
+    "llm+rule": 46,
+    "llm": 2236,
+    "rule": 114,
+    "derived": 6
   },
   "nodes_by_type": {
-    "Group": 68,
+    "Group": 111,
     "Era": 5,
-    "Award": 71,
-    "Label": 49,
-    "Genre": 9,
-    "Album": 606,
-    "Artist": 144,
-    "Song": 512,
-    "Program": 4
+    "Award": 104,
+    "Label": 65,
+    "Genre": 35,
+    "Album": 484,
+    "Artist": 254,
+    "Song": 614,
+    "Program": 11
   },
   "quote": {
-    "quote_total": 1912,
-    "quote_kept": 1777,
-    "quote_pass_rate": 0.9293933054393305,
+    "quote_total": 3387,
+    "quote_kept": 2986,
+    "quote_pass_rate": 0.8816061411278417,
     "quote_failed_samples": [
       {
         "h": "015B",
@@ -61,176 +63,166 @@
         "quotes": []
       },
       {
-        "h": "2Am",
-        "h_type": "Group",
-        "r": "FORMED_IN",
-        "t": "2000S",
-        "t_type": "Era",
-        "props": {
-          "year": "2008"
-        },
-        "origins": [
-          "llm"
-        ],
-        "agreement": 0.8,
-        "sources": [
-          "2AM"
-        ],
-        "quotes": []
-      },
-      {
-        "h": "2Am",
-        "h_type": "Group",
-        "r": "DEBUTED_IN",
-        "t": "2000S",
-        "t_type": "Era",
-        "props": {
-          "year": "2008"
-        },
-        "origins": [
-          "llm"
-        ],
-        "agreement": 0.8,
-        "sources": [
-          "2AM"
-        ],
-        "quotes": []
-      },
-      {
-        "h": "2Ne1",
+        "h": "015B",
         "h_type": "Group",
         "r": "RELEASED",
-        "t": "Collection",
+        "t": "1집 공일오비",
         "t_type": "Album",
-        "props": {},
+        "props": {
+          "year": "1990"
+        },
         "origins": [
           "llm"
         ],
         "agreement": 0.8,
         "sources": [
-          "2NE1"
+          "015B"
         ],
-        "quotes": [
-          "2012년부터 일본 진출을 발표했고 2012년 첫 일본 정규 음반 Collection을 발매했다."
-        ]
+        "quotes": []
       },
       {
-        "h": "Collection",
+        "h": "1집 공일오비",
         "h_type": "Album",
         "r": "RELEASED_IN",
-        "t": "2010S",
+        "t": "1990S",
         "t_type": "Era",
         "props": {
-          "year": "2012"
+          "year": "1990"
         },
         "origins": [
           "llm"
         ],
         "agreement": 0.8,
         "sources": [
-          "2NE1"
+          "015B"
         ],
-        "quotes": [
-          "2012년부터 일본 진출을 발표했고 2012년 첫 일본 정규 음반 Collection을 발매했다."
-        ]
+        "quotes": []
       },
       {
-        "h": "2Ne1",
+        "h": "015B",
         "h_type": "Group",
-        "r": "PERFORMED",
-        "t": "Hate You",
-        "t_type": "Song",
-        "props": {},
+        "r": "RELEASED",
+        "t": "2집 Second Episode",
+        "t_type": "Album",
+        "props": {
+          "year": "1991"
+        },
         "origins": [
           "llm"
         ],
         "agreement": 0.8,
         "sources": [
-          "2NE1"
+          "015B"
         ],
-        "quotes": [
-          "이에 앞서 \"Hate You\"를 세 번째 싱글로 발매해 다수 음원차트에서 실시간 1위에 올랐다."
-        ]
+        "quotes": []
       },
       {
-        "h": "2Ne1",
-        "h_type": "Group",
-        "r": "DEBUTED_IN",
-        "t": "2010S",
+        "h": "2집 Second Episode",
+        "h_type": "Album",
+        "r": "RELEASED_IN",
+        "t": "1990S",
         "t_type": "Era",
         "props": {
-          "year": "2010s"
+          "year": "1991"
         },
         "origins": [
           "llm"
         ],
         "agreement": 0.8,
         "sources": [
-          "2NE1"
+          "015B"
         ],
-        "quotes": [
-          "2011년 7월 21일에는 미니 앨범의 수록곡들이 공개되었고, 이에 앞서 \"Hate You\"를 세 번째 싱글로 발매해 다수 음원차트에서 실시간 1위에 올랐다."
-        ]
+        "quotes": []
       },
       {
-        "h": "Allday Project",
+        "h": "015B",
         "h_type": "Group",
-        "r": "WON",
-        "t": "2025 아시아 아티스트 어워즈 베스트 아티스트상",
-        "t_type": "Award",
+        "r": "RELEASED",
+        "t": "3집 The Third Wave (제3의 물결)",
+        "t_type": "Album",
         "props": {
-          "year": "2025"
+          "year": "1992"
         },
         "origins": [
           "llm"
         ],
         "agreement": 0.8,
         "sources": [
-          "ALLDAY PROJECT"
+          "015B"
         ],
-        "quotes": [
-          "2025년 2025 아시아 아티스트 어워즈 베스트 아티스트상"
-        ]
+        "quotes": []
       },
       {
-        "h": "Allday Project",
-        "h_type": "Group",
-        "r": "WON",
-        "t": "2025 아시아 아티스트 어워즈 여자 신인상",
-        "t_type": "Award",
+        "h": "3집 The Third Wave (제3의 물결)",
+        "h_type": "Album",
+        "r": "RELEASED_IN",
+        "t": "1990S",
+        "t_type": "Era",
         "props": {
-          "year": "2025"
+          "year": "1992"
         },
         "origins": [
           "llm"
         ],
         "agreement": 0.8,
         "sources": [
-          "ALLDAY PROJECT"
+          "015B"
         ],
-        "quotes": [
-          "2025년 2025 아시아 아티스트 어워즈 여자 신인상"
-        ]
+        "quotes": []
       },
       {
-        "h": "Allday Project",
+        "h": "015B",
         "h_type": "Group",
-        "r": "WON",
-        "t": "2025 아시아 아티스트 어워즈 뉴 웨이브상",
-        "t_type": "Award",
+        "r": "RELEASED",
+        "t": "4집 The Fourth Movement (제4악장)",
+        "t_type": "Album",
         "props": {
-          "year": "2025"
+          "year": "1993"
         },
         "origins": [
           "llm"
         ],
         "agreement": 0.8,
         "sources": [
-          "ALLDAY PROJECT"
+          "015B"
         ],
-        "quotes": [
-          "2025년 2025 아시아 아티스트 어워즈 뉴 웨이브상"
-        ]
+        "quotes": []
+      },
+      {
+        "h": "4집 The Fourth Movement (제4악장)",
+        "h_type": "Album",
+        "r": "RELEASED_IN",
+        "t": "1990S",
+        "t_type": "Era",
+        "props": {
+          "year": "1993"
+        },
+        "origins": [
+          "llm"
+        ],
+        "agreement": 0.8,
+        "sources": [
+          "015B"
+        ],
+        "quotes": []
+      },
+      {
+        "h": "015B",
+        "h_type": "Group",
+        "r": "RELEASED",
+        "t": "5집 Big 5",
+        "t_type": "Album",
+        "props": {
+          "year": "1994"
+        },
+        "origins": [
+          "llm"
+        ],
+        "agreement": 0.8,
+        "sources": [
+          "015B"
+        ],
+        "quotes": []
       },
       {
         "h": "태연",
@@ -285,6 +277,62 @@
         "quotes": [
           "현아의 Bubble Pop! 유튜브 뮤직비디오와 Ice Cream (Feat. Maboos) 유튜브 뮤직비디오와 잘나가서 그래 (Feat. 정일훈 Of BTOB) 유튜브 뮤직비디오, 아이유의 팔레트 (Feat. G-DRAGON) 유튜브 뮤직비디오, 선미의 가시나 유튜브 뮤직비디오가 각각 유튜브 조회수 1억 회를 달성했다."
         ]
+      },
+      {
+        "h": "Rollin'",
+        "h_type": "Song",
+        "r": "HAS_GENRE",
+        "t": "트로피컬 하우스",
+        "t_type": "Genre",
+        "props": {
+          "year": "2010s"
+        },
+        "origins": [
+          "llm"
+        ],
+        "agreement": 0.8,
+        "sources": [
+          "K-pop"
+        ],
+        "quotes": []
+      },
+      {
+        "h": "Way Back Home",
+        "h_type": "Song",
+        "r": "HAS_GENRE",
+        "t": "트로피컬 하우스",
+        "t_type": "Genre",
+        "props": {
+          "year": "2010s"
+        },
+        "origins": [
+          "llm"
+        ],
+        "agreement": 0.8,
+        "sources": [
+          "K-pop"
+        ],
+        "quotes": []
+      },
+      {
+        "h": "Ive",
+        "h_type": "Group",
+        "r": "PERFORMED",
+        "t": "Accendio",
+        "t_type": "Song",
+        "props": {
+          "year": "2024"
+        },
+        "origins": [
+          "llm"
+        ],
+        "agreement": 0.8,
+        "sources": [
+          "K-pop"
+        ],
+        "quotes": [
+          "IVE 역시 《Accendio》(2024)에서 마법소녀를 모티브로 한 뮤직비디오를 선보이기도 하였다."
+        ]
       }
     ],
     "chunk_failures": []
@@ -294,33 +342,33 @@
       "록",
       "록",
       "짝",
-      "짝",
+      "2016년",
+      "2014년",
       "달",
       "1",
       "2015년",
+      "첸",
+      "첸",
+      "첸",
+      "첸",
+      "첸",
+      "첸",
+      "첸",
+      "첸",
+      "첸",
       "길",
+      "2019년 1월 10일",
       "빛",
       "슈",
       "슈",
+      "슈",
+      "2016-10-03",
+      "첸",
       "S",
       "S",
       "2017년",
       "팝",
-      "怒",
-      "1996년",
-      "怒",
-      "怒",
-      "빛",
-      "2014년",
-      "[E]",
-      "ㅋ",
-      "21세기 데뷔한 가수 중 최초의 기록",
-      "21세기 데뷔한 가수 중 최초의 기록",
-      "가요톱10_1980S",
-      "가요톱10_1980S",
-      "가요톱10_1980S",
-      "가요톱10_1980S",
-      "가요톱10_1980S"
+      "怒"
     ],
     "type_conflicts": [],
     "symmetric_collapsed": 0

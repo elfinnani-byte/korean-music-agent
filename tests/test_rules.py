@@ -53,6 +53,18 @@ def test_r01_requires_genre_lexicon():
     assert _find(bad, "HAS_GENRE") == []
 
 
+def test_r07_recognizes_mnet_award_category_english_prefix():
+    """실측 버그: 코퍼스의 실제 분류는 'Mnet 아시안 뮤직 어워드
+       올해의 가수상 수상 음악가'(영문 'Mnet' 접두)인데
+       AWARD_CANON 은 '엠넷 아시안 뮤직 어워드'만 등록돼 있어
+       52건 코퍼스에서 이 시상식 WON 이 0건이었다."""
+    out = rules.apply("빅뱅", ["Mnet 아시안 뮤직 어워드 올해의 가수상 수상 음악가"])
+    won = _find(out, "WON")
+    assert len(won) == 1
+    assert won[0]["t"] == "엠넷 아시안 뮤직 어워드"
+    assert won[0]["props"]["award_category"] == "올해의 가수상"
+
+
 def test_r02_requires_label_lexicon():
     ok = rules.apply("보아", ["SM 엔터테인먼트 소속"])
     assert _find(ok, "SIGNED_TO")[0]["t"] == "SM 엔터테인먼트"

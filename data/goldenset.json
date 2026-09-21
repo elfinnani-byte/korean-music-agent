@@ -2,7 +2,7 @@
   "version": "1.0",
   "domain": "한국 대중음악 1992~현재",
   "judging_rules": "judging_rules.md",
-  "note": "era_cross 는 설계 목표 4건 대신 실측 2건이다. judging_rules.md 참조.",
+  "note": "era_cross 는 설계 목표 4건 대신 실측 2건이다. P5 관문 골든셋 경로 실현율은 16/22(73%)이며 나머지 6건(Q07·Q08·Q09·Q17·Q18·Q19)은 그래프에 해당 사실이 없다(LLM 추출 누락, 파이프라인 버그 아님). judging_rules.md 참조.",
   "items": [
     {
       "id": "Q01", "question": "동방신기는 어느 기획사에 소속되어 있는가?",
@@ -187,10 +187,10 @@
       "notes": "PRODUCED+PERFORMED."
     },
     {
-      "id": "Q10", "question": "지드래곤이 소속된 그룹이 2008년 MNET KM 뮤직 페스티벌에서 받은 상은?",
+      "id": "Q10", "question": "지드래곤이 소속된 그룹이 수상한 시상식 두 곳은?",
       "hops": 2, "era_cross": false, "route": "path", "split": "tuned",
       "era_span": ["2000s"], "answer_type": "set",
-      "answer_set": ["최우수 남자그룹상", "올해의 가수상"],
+      "answer_set": ["골든디스크", "서울가요대상"],
       "partial_credit": {"full": 2, "half": 1},
       "expected_behavior": "answer",
       "seed_hint": ["지드래곤"],
@@ -200,17 +200,19 @@
       ]],
       "expected_triples": [
         ["지드래곤", "MEMBER_OF", "빅뱅"],
-        ["빅뱅", "WON", "최우수 남자그룹상"],
-        ["빅뱅", "WON", "올해의 가수상"]
+        ["빅뱅", "WON", "골든디스크"],
+        ["빅뱅", "WON", "서울가요대상"]
       ],
       "evidence": [
         {"doc": "빅뱅_(음악_그룹).md",
          "quote": "빅뱅(BIGBANG)은 2006년 8월 19일에 데뷔한 대한민국의 3인조 보이 그룹이다. 멤버는 지드래곤, 태양, 대성이다"},
         {"doc": "빅뱅_(음악_그룹).md",
-         "quote": "빅뱅은 MNET KM 뮤직 페스티벌에서 최우수 남자그룹상과 올해의 가수상을 수상하였다."}
+         "quote": "골든디스크 본상 수상 음악가"},
+        {"doc": "빅뱅_(음악_그룹).md",
+         "quote": "또한 제17회 서울가요대상에서 대상, 본상, 디지털음원상을 수상하며 3관왕을 차지했다."}
       ],
       "difficulty": "medium",
-      "notes": "MEMBER_OF 순방향 + WON. 집합형."
+      "notes": "MEMBER_OF 순방향 + WON. 집합형. 원안은 시상식 부문상(최우수 남자그룹상·올해의 가수상)을 WON의 대상 노드로 가정했으나, 실제 스키마·rules.py 설계는 WON의 대상을 시상식 자체(예: 골든디스크)로 두고 부문은 간선 속성 award_category 로 남긴다. 그래서 원안 대상 두 개가 그래프에 노드로 존재하지 않아(P5 골든셋 재현율 검증에서 실측) 시상식 이름 자체를 묻도록 정정했다."
     },
     {
       "id": "Q11", "question": "강남스타일을 작사·작곡한 가수가 이 곡을 수록한 음반의 제목은?",
@@ -361,7 +363,7 @@
       "expected_triples": [
         ["박진영", "FOUNDED", "JYP 엔터테인먼트"],
         ["Stray Kids", "SIGNED_TO", "JYP 엔터테인먼트"],
-        ["Stray Kids", "PERFORMED", "디스트릭트9"]
+        ["Stray Kids", "PERFORMED", "District 9"]
       ],
       "evidence": [
         {"doc": "God_(음악_그룹).md",
