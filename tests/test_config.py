@@ -42,3 +42,44 @@ def test_validate_raises_when_bridge_relation_unknown():
     cfg["retrieval"]["quota_exempt_relations"] = ["NOT_A_RELATION"]
     with pytest.raises(ValueError, match="NOT_A_RELATION"):
         config_loader.validate(cfg)
+
+
+def test_config_has_origin_base_score_matching_join_convention():
+    """build_stats.json 의 edges_by_origin 은 '+'.join(sorted(origins))로
+       키를 만든다 — 알파벳 정렬이라 'llm+rule'이지 'rule+llm'이 아니다."""
+    cfg = config_loader.load()
+    scores = cfg["retrieval"]["origin_base_score"]
+    assert scores["llm+rule"] == 1.1
+    assert "rule+llm" not in scores
+
+
+def test_config_has_genre_hop_exception_for_vector_route():
+    cfg = config_loader.load()
+    g = cfg["retrieval"]["genre_hop_in_vector_route"]
+    assert g["allowed"] is True
+    assert g["max_hops"] == 1
+
+
+def test_config_has_eval_sweep_grid_matching_design_doc():
+    cfg = config_loader.load()
+    sweep = cfg["eval"]["sweep"]
+    assert sweep["max_radius"] == [2, 3, 4]
+    assert sweep["hub_degree_threshold"] == [15, 25, 40, None]
+    assert sweep["per_relation"] == [5, 10, 20]
+    assert sweep["max_triples"] == [100, 200, 400]
+
+
+def test_config_has_unfrozen_holdout_fingerprint_slots():
+    cfg = config_loader.load()
+    h = cfg["eval"]["holdout"]
+    assert h["frozen"] is False
+    for k in ("frozen_at", "freeze_commit", "config_hash", "schema_version",
+              "prompt_version", "goldenset_hash", "graph_hash"):
+        assert k in h
+
+
+def test_validate_rejects_non_alphabetical_origin_key():
+    cfg = config_loader.load()
+    cfg["retrieval"]["origin_base_score"]["rule+llm"] = 1.1
+    with pytest.raises(ValueError, match="알파벳 정렬"):
+        config_loader.validate(cfg)

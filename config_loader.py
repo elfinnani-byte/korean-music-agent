@@ -31,6 +31,13 @@ def validate(cfg: dict) -> None:
         if ntype not in schema.NODE_TYPES:
             raise ValueError(f"entity_type_overrides 의 알 수 없는 타입: {name} -> {ntype}")
 
+    origin_keys = set(cfg["retrieval"]["origin_base_score"])
+    if "rule+llm" in origin_keys:
+        raise ValueError(
+            "origin_base_score 키는 알파벳 정렬 결합('llm+rule')이어야 한다. "
+            "build_stats.json 의 edges_by_origin 이 그렇게 키를 만든다"
+        )
+
 
 if __name__ == "__main__":
     import sys

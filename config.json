@@ -84,7 +84,9 @@
     "degree_penalty_exponent": 0.5,
     "quota_exempt_origins": ["rule", "tracklist"],
     "quota_exempt_relations": ["INFLUENCED", "COVERED", "PRODUCED", "WROTE", "FOUNDED"],
-    "bridge_min_agreement": 0.8
+    "bridge_min_agreement": 0.8,
+    "origin_base_score": {"rule": 1.0, "llm+rule": 1.1, "tracklist": 1.0, "derived": 0.9, "llm": 0.8},
+    "genre_hop_in_vector_route": {"allowed": true, "max_hops": 1, "penalty": 0.4, "neighbor_sample_k": 15}
   },
 
   "gates": {
@@ -101,6 +103,8 @@
     }
   },
 
+  "community": {"attr_weight": 0.3, "resolution": 1.0, "min_size": 4, "seed": 42},
+
   "llm": {
     "profiles": {
       "extract": {"provider": "openai", "model": "gpt-4.1-mini", "temperature": 0.0},
@@ -110,5 +114,22 @@
     "env_keys": {"openai": "OPENAI_API_KEY", "google": "GOOGLE_API_KEY"},
     "request_timeout_sec": 90,
     "max_retries": 3
+  },
+
+  "eval": {
+    "judge_repeats": 3,
+    "sweep": {
+      "max_radius": [2, 3, 4],
+      "hub_degree_threshold": [15, 25, 40, null],
+      "per_relation": [5, 10, 20],
+      "max_triples": [100, 200, 400]
+    },
+    "splits": {"tuned": 15, "holdout": 10},
+    "holdout": {
+      "frozen": false, "frozen_at": null, "freeze_commit": null,
+      "config_hash": null, "schema_version": null,
+      "prompt_version": null, "goldenset_hash": null, "graph_hash": null
+    },
+    "baseline": {"method": "bm25", "k": 6, "chunk_chars": 800, "tokenizer": "morpheme"}
   }
 }
