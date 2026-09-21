@@ -59,3 +59,57 @@ def relation_gap(state: dict) -> list[list[str]]:
         if not any(rel in have for rel in group):
             gaps.append(group)
     return gaps
+
+
+import json
+import re
+
+import schema
+
+
+def route_by_rule(question: str) -> tuple[str | None, str | None, list[list[str]] | None]:
+    """규칙 1차 판정. 확신이 없으면 (None, None, None)을 반환해
+       route_question() 이 LLM 폴백을 부르게 한다."""
+    if any(h in question for h in schema.GLOBAL_HINTS):
+        return "global", "rule", []
+    if any(h in question for h in schema.VECTOR_HINTS):
+        # 벡터 인덱스가 없어 path 로 강등한다. required_rels 를 비우는
+        # 이유는 서술형 질의가 어떤 관계를 요구하는지 규칙으로 알 수
+        # 없어서이고, 빈 required_rels 는 relation_gap() 에서 공백 없음으로
+        # 처리돼 n_build_context 를 그대로 통과한다.
+        return "path", "rule", []
+
+    matched: list[list[str]] = []
+    for pattern, rels in schema.CUE_TO_RELATIONS.items():
+        if re.search(pattern, question):
+            matched.append(rels)
+    if not matched:
+        return None, None, None
+    route = "local" if len(matched) == 1 else "path"
+    return route, "rule", matched
+
+
+def _parse_route_json(text: str) -> dict:
+    m = re.search(r"\{.*\}", text, re.S)
+    if not m:
+        raise ValueError(f"라우터 LLM 응답에서 JSON 을 찾지 못함: {text[:200]}")
+    return json.loads(m.group(0))
+
+
+def route_question(question: str, cfg: dict, llm=None) -> RAGState:
+    state = initial_state(question)
+    route, by, rels = route_by_rule(question)
+    if route is not None:
+        state["route"], state["route_by"], state["required_rels"] = route, by, rels
+        return state
+
+    prompt = schema.ROUTE_LLM_PROMPT.format(
+        relation_names=", ".join(schema.allowed_relationship_names()),
+        question=question,
+    )
+    resp = llm.invoke(prompt)
+    parsed = _parse_route_json(resp.content)
+    state["route"] = parsed.get("route", "reject")
+    state["route_by"] = "llm"
+    state["required_rels"] = parsed.get("required_rels", [])
+    return state

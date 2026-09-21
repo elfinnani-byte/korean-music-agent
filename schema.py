@@ -203,7 +203,7 @@ CUE_TO_RELATIONS: dict[str, list[str]] = {
     "유닛|서브유닛": ["SUBUNIT_OF"],
     "소속|소속사": ["SIGNED_TO"],
     "설립|세운|창립": ["FOUNDED"],
-    "데뷔": ["DEBUTED_IN"],
+    r"데뷔(?!곡)": ["DEBUTED_IN"],  # '데뷔곡'은 데뷔 시점이 아니라 노래를 가리키는 명사구다
     "결성|창단": ["FORMED_IN"],
     "발매|나온|수록된 음반": ["RELEASED_IN"],
     "수상|받은 상|탄 상": ["WON"],
