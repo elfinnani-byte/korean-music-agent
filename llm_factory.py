@@ -28,6 +28,15 @@ def get_llm(profile: str, cfg: dict, override: dict | None = None):
         # 프로바이더별 파라미터 이름 차이를 여기서 흡수한다
         key = "max_output_tokens" if provider == "google" else "max_tokens"
         kwargs[key] = spec["max_tokens"]
+    # 실측 버그: 이 값들이 config.json 에 있어도 여기서 실제로 넘기지
+    # 않으면 타임아웃도 재시도도 작동하지 않는 죽은 설정이 된다(피어
+    # 리뷰 견고성 점검 중 발견). ChatOpenAI 는 request_timeout, Google
+    # 은 timeout 이라 이름이 다르다 - max_retries 는 이름이 같다.
+    if "request_timeout_sec" in cfg["llm"]:
+        key = "timeout" if provider == "google" else "request_timeout"
+        kwargs[key] = cfg["llm"]["request_timeout_sec"]
+    if "max_retries" in cfg["llm"]:
+        kwargs["max_retries"] = cfg["llm"]["max_retries"]
     return Chat(**kwargs)
 
 

@@ -21,6 +21,36 @@ def test_status_reports_configured_when_key_present(monkeypatch):
     assert st["google"] == "absent"
 
 
+def test_get_llm_wires_timeout_and_retries_from_config(monkeypatch):
+    """실측 버그: config.json 의 llm.request_timeout_sec/max_retries 는
+       읽히기만 하고 실제 ChatOpenAI/ChatGoogleGenerativeAI 생성자에는
+       전달되지 않았다 - 설정값이 있어도 타임아웃도 재시도도 실제로는
+       작동하지 않는 '죽은 설정'이었다(피어 리뷰 견고성 점검 중 발견)."""
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
+    cfg = {"llm": {
+        "profiles": {"extract": {"provider": "openai", "model": "gpt-4.1-mini", "temperature": 0.0}},
+        "env_keys": {"openai": "OPENAI_API_KEY"},
+        "request_timeout_sec": 90,
+        "max_retries": 3,
+    }}
+    llm = llm_factory.get_llm("extract", cfg)
+    assert llm.request_timeout == 90
+    assert llm.max_retries == 3
+
+
+def test_get_llm_wires_timeout_and_retries_for_google(monkeypatch):
+    monkeypatch.setenv("GOOGLE_API_KEY", "g-test")
+    cfg = {"llm": {
+        "profiles": {"judge": {"provider": "google", "model": "gemini-3.8-flash", "temperature": 0.0}},
+        "env_keys": {"google": "GOOGLE_API_KEY"},
+        "request_timeout_sec": 90,
+        "max_retries": 3,
+    }}
+    llm = llm_factory.get_llm("judge", cfg)
+    assert llm.timeout == 90
+    assert llm.max_retries == 3
+
+
 def test_extract_text_passes_through_plain_string():
     class R:
         content = "1.0"
