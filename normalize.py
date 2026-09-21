@@ -92,3 +92,122 @@ def canonical_symmetric(a: tuple[str, str], b: tuple[str, str]):
        튜플이 나올 수 있기 때문이다."""
     key = lambda x: (TYPE_ORDER.get(x[1], 99), norm_key(x[0]))
     return tuple(sorted([a, b], key=key))
+
+
+import networkx as nx
+
+
+def _context_of(triple: dict, side: str) -> str | None:
+    """Song·Album 노드의 맥락을 삼중항에서 유추한다."""
+    if side == "t" and triple["r"] in ("PERFORMED", "RELEASED", "WROTE", "PRODUCED"):
+        return triple["h"]
+    if side == "t" and triple["r"] == "CONTAINS":
+        return triple["h"]
+    if side == "h" and triple["r"] == "CONTAINS":
+        return None
+    return None
+
+
+def merge_triples(triples: list[dict], cfg: dict,
+                  types: dict[str, str]) -> tuple[nx.MultiDiGraph, dict]:
+    """삼중항을 그래프로 합친다. 정규화는 규칙·트랙리스트·LLM 을
+       모두 합친 뒤 단 한 번만 돌린다."""
+    overrides = cfg["normalize"]["entity_type_overrides"]
+    g = nx.MultiDiGraph()
+    report = {"dropped_junk": [], "type_conflicts": [], "symmetric_collapsed": 0}
+
+    def ensure(name: str, triple: dict, side: str) -> str | None:
+        ntype = overrides.get(clean_name(name)) or types.get(name)
+        if ntype is None or is_junk(name, ntype):
+            report["dropped_junk"].append(name)
+            return None
+        nid = node_id(name, ntype, _context_of(triple, side))
+        if nid not in g:
+            g.add_node(nid, name=clean_name(name), type=ntype,
+                       norm=norm_key(name), aliases=[])
+        elif g.nodes[nid]["type"] != ntype:
+            report["type_conflicts"].append((name, g.nodes[nid]["type"], ntype))
+        return nid
+
+    for tri in triples:
+        rel = tri["r"]
+        h_name, t_name = tri["h"], tri["t"]
+
+        if rel in schema.SYMMETRIC_RELATIONS:
+            ha = (h_name, overrides.get(clean_name(h_name)) or types.get(h_name, "Artist"))
+            tb = (t_name, overrides.get(clean_name(t_name)) or types.get(t_name, "Artist"))
+            (h_name, _), (t_name, _) = canonical_symmetric(ha, tb)
+
+        h = ensure(h_name, tri, "h")
+        t = ensure(t_name, tri, "t")
+        if h is None or t is None or h == t:
+            continue
+
+        existing = None
+        for _, tgt, key, data in g.edges(h, keys=True, data=True):
+            if tgt == t and data["relation"] == rel:
+                existing = (key, data)
+                break
+
+        if existing is None:
+            g.add_edge(h, t, relation=rel, props=dict(tri.get("props", {})),
+                       origins=list(tri.get("origins", [])),
+                       agreement=tri.get("agreement", 0.8),
+                       count=1,
+                       sources=list(tri.get("sources", [])),
+                       quotes=list(tri.get("quotes", [])))
+        else:
+            _, data = existing
+            data["count"] += 1
+            for o in tri.get("origins", []):
+                if o not in data["origins"]:
+                    data["origins"].append(o)
+            if {"rule", "llm"} <= set(data["origins"]):
+                data["agreement"] = 1.0
+            else:
+                data["agreement"] = min(1.0, data["agreement"] + 0.05)
+            for q in tri.get("quotes", []):
+                if q not in data["quotes"]:
+                    data["quotes"].append(q)
+            for s in tri.get("sources", []):
+                if s not in data["sources"]:
+                    data["sources"].append(s)
+            data["props"].update(tri.get("props", {}))
+
+    for nid in list(g.nodes):
+        g.nodes[nid]["degree"] = g.degree(nid)
+    return g, report
+
+
+def add_derived_edges(g: nx.MultiDiGraph) -> nx.MultiDiGraph:
+    """COVERED 파생. 같은 Song 에 원곡 PERFORMED 와 리메이크 PERFORMED 가
+       함께 붙으면 (리메이크 가수, COVERED, 원곡 가수) 를 만든다.
+
+       LABELMATE_OF 는 의도적으로 만들지 않는다."""
+    by_song: dict[str, dict[str, list[str]]] = {}
+    for u, v, data in g.edges(data=True):
+        if data["relation"] != "PERFORMED":
+            continue
+        bucket = by_song.setdefault(v, {"orig": [], "cover": []})
+        is_cover = bool(data.get("props", {}).get("cover"))
+        bucket["cover" if is_cover else "orig"].append(u)
+
+    for song, sides in by_song.items():
+        for coverer in sides["cover"]:
+            for original in sides["orig"]:
+                if coverer == original:
+                    continue
+                g.add_edge(coverer, original, relation="COVERED",
+                           props={"via_song": g.nodes[song]["name"]},
+                           origins=["derived"], agreement=0.8, count=1,
+                           sources=list({*g.nodes[song].get("aliases", []),
+                                         g.nodes[song]["name"]}),
+                           quotes=[])
+    return g
+
+
+def annotate_hubs(g: nx.MultiDiGraph, threshold: int) -> None:
+    for nid in g.nodes:
+        deg = g.degree(nid)
+        g.nodes[nid]["degree"] = deg
+        g.nodes[nid]["is_hub"] = deg > threshold
