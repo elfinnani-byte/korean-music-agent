@@ -31,6 +31,24 @@ def get_llm(profile: str, cfg: dict, override: dict | None = None):
     return Chat(**kwargs)
 
 
+def extract_text(resp) -> str:
+    """resp.content 를 항상 평범한 문자열로 돌려준다.
+       OpenAI 는 content 가 문자열이지만, Google(gemini-3.8-flash 등)은
+       [{'type':'text','text':'...', 'extras':{...}}] 같은 콘텐츠 블록
+       리스트로 돌려줄 때가 있다(실측: P8 평가 실행 중 TypeError 로
+       처음 드러남). 텍스트가 아닌 블록(예: 'thinking')은 건너뛴다."""
+    content = resp.content
+    if isinstance(content, str):
+        return content
+    parts = []
+    for block in content:
+        if isinstance(block, str):
+            parts.append(block)
+        elif isinstance(block, dict) and block.get("type") == "text":
+            parts.append(block.get("text", ""))
+    return "\n".join(parts)
+
+
 def provider_status(cfg: dict, ping: bool = True) -> dict[str, str]:
     """absent | configured | available | failed
        키 문자열이 있는 것과 실제로 호출되는 것은 다르다. 오타 난 키를

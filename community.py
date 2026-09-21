@@ -66,7 +66,9 @@ def summarize_community(profile: dict, llm) -> dict:
     resp = llm.invoke(prompt)
     import json
     import re
-    m = re.search(r"\{.*\}", resp.content, re.S)
+
+    import llm_factory
+    m = re.search(r"\{.*\}", llm_factory.extract_text(resp), re.S)
     return json.loads(m.group(0)) if m else {"title": "", "summary": "", "findings": []}
 
 

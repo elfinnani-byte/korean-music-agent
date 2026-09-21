@@ -11,6 +11,7 @@ if sys.platform == "win32":
 
 import normalize as nz
 import schema
+import llm_factory
 
 
 def _find_node(g, name: str) -> str | None:
@@ -196,7 +197,7 @@ def baseline_answer(question: str, chunks: list[tuple[str, str]], cfg: dict, llm
     sources = [title for title, _, _ in hits]
     prompt = (f"{schema.ANSWER_SYSTEM_PROMPT}\n\n[근거 원문 청크]\n{context}\n\n[질문]\n{question}")
     resp = llm.invoke(prompt)
-    return resp.content, sources
+    return llm_factory.extract_text(resp), sources
 
 
 import re
@@ -207,7 +208,7 @@ def judge_score(question: str, model_answer: str, gold_answer: str,
     prompt = schema.JUDGE_PROMPT.format(question=question, model_answer=model_answer,
                                         gold_answer=gold_answer, evidence=evidence)
     resp = llm.invoke(prompt)
-    m = re.search(r"\b(1\.0|0\.5|0\.0)\b", resp.content)
+    m = re.search(r"\b(1\.0|0\.5|0\.0)\b", llm_factory.extract_text(resp))
     return float(m.group(1)) if m else None
 
 

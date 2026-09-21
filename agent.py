@@ -65,6 +65,7 @@ import json
 import re
 
 import schema
+import llm_factory
 
 
 def route_by_rule(question: str) -> tuple[str | None, str | None, list[list[str]] | None]:
@@ -108,7 +109,7 @@ def route_question(question: str, cfg: dict, llm=None) -> RAGState:
         question=question,
     )
     resp = llm.invoke(prompt)
-    parsed = _parse_route_json(resp.content)
+    parsed = _parse_route_json(llm_factory.extract_text(resp))
     state["route"] = parsed.get("route", "reject")
     state["route_by"] = "llm"
     state["required_rels"] = parsed.get("required_rels", [])
@@ -143,7 +144,7 @@ def find_seeds(g, question: str, cfg: dict, llm=None) -> list[str]:
         return []
     resp = llm.invoke(f"다음 질문에서 언급된 고유명사(인물·그룹·곡·앨범·회사)만 "
                        f"JSON으로 뽑아라. 형식: {{\"entities\": [\"...\"]}}\n\n질문: {question}")
-    parsed = _parse_route_json(resp.content)
+    parsed = _parse_route_json(llm_factory.extract_text(resp))
     found = []
     for ent in parsed.get("entities", []):
         ent_norm = nz.norm_key(ent)
@@ -332,7 +333,7 @@ def synthesize(question: str, context: str, sources: list[str], llm) -> tuple[st
     prompt = (f"{schema.ANSWER_SYSTEM_PROMPT}\n\n"
               f"[근거 삼중항]\n{context}\n\n[질문]\n{question}")
     resp = llm.invoke(prompt)
-    text = resp.content
+    text = llm_factory.extract_text(resp)
     decision = "abstain" if "근거가 부족합니다" in text else "answer"
     return text, decision, True
 
