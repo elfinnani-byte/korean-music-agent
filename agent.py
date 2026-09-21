@@ -288,3 +288,26 @@ def run_retrieval(g, seeds: list[str], required_rels: list[list[str]], cfg: dict
 
     return {"triples": state["triples"], "trace": state["trace"],
             "radius_used": radius, "gap_rels": gaps}
+
+
+def build_context(triples: list[dict]) -> tuple[str, list[str]]:
+    """삼중항을 관계별로 묶어 텍스트화한다. 출처(등장한 개체명 전체)를
+       함께 반환해 답변 프롬프트의 '근거 밖 개체 금지' 검사에 쓴다."""
+    by_rel: dict[str, list[dict]] = {}
+    for t in triples:
+        by_rel.setdefault(t["r"], []).append(t)
+    lines = []
+    sources: set[str] = set()
+    for rel, group in by_rel.items():
+        lines.append(f"[{rel}]")
+        for t in group:
+            lines.append(f"  ({t['h']}, {rel}, {t['t']})")
+            sources.add(t["h"]); sources.add(t["t"])
+    return "\n".join(lines), sorted(sources)
+
+
+def insufficient_answer(gap_rels: list[str]) -> str:
+    """관계 공백이 남으면 LLM 을 아예 부르지 않고 이 문자열을 그대로 낸다.
+       토큰도 아끼고 환각도 원천 차단한다(코드층 방어)."""
+    rels = ", ".join(gap_rels) if gap_rels else "알 수 없음"
+    return f"근거가 부족합니다. 이 자료만으로는 확인할 수 없습니다.\n(미확보 관계: {rels})"
