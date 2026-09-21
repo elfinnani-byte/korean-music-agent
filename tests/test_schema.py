@@ -62,3 +62,32 @@ def test_extraction_instructions_mention_quote_requirement():
 def test_extraction_instructions_do_not_mention_absent_relations():
     """스키마에 없는 관계를 암시하는 낱말을 넣으면 모델이 엉뚱한 타입으로 흘린다."""
     assert "출연" not in schema.EXTRACTION_INSTRUCTIONS
+
+
+def test_cue_to_relations_maps_known_cues():
+    assert schema.CUE_TO_RELATIONS["멤버|일원|구성원"] == ["MEMBER_OF"]
+    assert schema.CUE_TO_RELATIONS["리메이크|커버|다시 불"] == ["COVERED", "PERFORMED"]
+
+
+def test_all_cue_relations_are_declared_in_schema():
+    """단서어 사전이 스키마에 없는 관계를 가리키면 라우터가 존재하지 않는
+       관계로 required_rels 를 채우게 된다."""
+    known = set(schema.allowed_relationship_names())
+    for rels in schema.CUE_TO_RELATIONS.values():
+        for r in rels:
+            assert r in known, f"CUE_TO_RELATIONS 에 스키마에 없는 관계: {r}"
+
+
+def test_answer_system_prompt_has_both_hallucination_guards():
+    assert "근거가 부족합니다" in schema.ANSWER_SYSTEM_PROMPT
+    assert "개체명만" in schema.ANSWER_SYSTEM_PROMPT
+    assert "연도" in schema.ANSWER_SYSTEM_PROMPT
+
+
+def test_route_llm_prompt_lists_all_five_routes():
+    for route in ("local", "path", "global", "vector", "reject"):
+        assert route in schema.ROUTE_LLM_PROMPT
+
+
+def test_judge_prompt_requires_evidence_grounded_score():
+    assert "1.0" in schema.JUDGE_PROMPT and "0.5" in schema.JUDGE_PROMPT and "0.0" in schema.JUDGE_PROMPT
