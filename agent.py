@@ -153,10 +153,14 @@ def find_seeds(g, question: str, cfg: dict, llm=None) -> list[str]:
     return found[:max_seeds]
 
 
-def is_hub(g, nid: str, threshold: int) -> bool:
+def is_hub(g, nid: str, threshold: int | None) -> bool:
     """허브 판정은 저장된 is_hub 속성이 아니라 그때그때 차수로 계산한다.
        graph.json 의 is_hub 는 빌드 시점 임계값(25)으로 굳어 있어, 스윕이
-       다른 임계값을 시도해도 반영되지 않기 때문이다."""
+       다른 임계값을 시도해도 반영되지 않기 때문이다.
+       threshold=None 은 '차단 없음'이다(설계서 6.2 스윕 격자의 네
+       번째 칸) — 차수가 아무리 높아도 허브로 치지 않는다."""
+    if threshold is None:
+        return False
     return g.degree(nid) > threshold
 
 
@@ -254,18 +258,27 @@ def expand_one_hop(g, state: dict, cfg: dict) -> dict:
     }
 
 
+_UNSET = object()  # None 자체가 '차단 없음'이라는 유효한 값이라 '지정 안 함'과 구별해야 한다
+
+
 def run_retrieval(g, seeds: list[str], required_rels: list[list[str]], cfg: dict,
                   max_radius_override: int | None = None,
-                  hub_degree_threshold_override: int | None = None,
+                  hub_degree_threshold_override: int | None = _UNSET,
                   per_relation_override: int | None = None,
                   max_triples_override: int | None = None) -> dict:
     """expand_one_hop 을 반경이 다하거나 관계 공백이 없어질 때까지 반복한다.
        LLM 을 부르지 않는 순수 함수다 — P7 스윕이 override 인자로 파라미터를
-       바꿔 가며 이 함수를 직접 호출한다."""
+       바꿔 가며 이 함수를 직접 호출한다.
+
+       hub_degree_threshold_override 만 기본값이 _UNSET(미지정)이다. 다른
+       override 들은 None 이 곧 '지정 안 함'이라 문제없지만, 이 값은
+       None 자체가 스윕 격자의 '차단 없음' 칸을 뜻하는 유효한 값이라
+       '지정 안 함'과 같은 기호로 겹치면 '차단 없음'을 요청해도 조용히
+       기본 임계값으로 되돌아가는 버그가 생긴다(실측)."""
     local_cfg = {**cfg, "retrieval": {**cfg["retrieval"]}}
     if max_radius_override is not None:
         local_cfg["retrieval"]["max_radius"] = max_radius_override
-    if hub_degree_threshold_override is not None:
+    if hub_degree_threshold_override is not _UNSET:
         local_cfg["retrieval"]["hub_degree_threshold"] = hub_degree_threshold_override
     if per_relation_override is not None:
         local_cfg["retrieval"]["per_relation"] = per_relation_override

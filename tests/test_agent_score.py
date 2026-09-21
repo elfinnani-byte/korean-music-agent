@@ -58,3 +58,11 @@ def test_is_hub_recomputed_live_not_from_stored_attribute():
     g.nodes["t"]["is_hub"] = False  # 저장된 값은 일부러 틀리게 둔다
     assert agent.is_hub(g, "t", threshold=25) is True
     assert agent.is_hub(g, "t", threshold=40) is False
+
+
+def test_is_hub_none_threshold_means_no_cap():
+    """스윕 격자의 hub_degree_threshold 값 중 None 은 '차단 없음'을
+       뜻한다(6.2의 15·25·40·차단 없음). 차수가 아무리 높아도 허브로
+       치지 않아야 한다."""
+    g = _g_with_degree(500)
+    assert agent.is_hub(g, "t", threshold=None) is False

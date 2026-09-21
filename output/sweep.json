@@ -1,0 +1,866 @@
+[
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": null,
+    "per_relation": 5,
+    "max_triples": 100,
+    "avg_triple_recall": 0.32575757575757575,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": null,
+    "per_relation": 5,
+    "max_triples": 200,
+    "avg_triple_recall": 0.32575757575757575,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": null,
+    "per_relation": 5,
+    "max_triples": 400,
+    "avg_triple_recall": 0.32575757575757575,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": null,
+    "per_relation": 10,
+    "max_triples": 100,
+    "avg_triple_recall": 0.32575757575757575,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": null,
+    "per_relation": 10,
+    "max_triples": 200,
+    "avg_triple_recall": 0.32575757575757575,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": null,
+    "per_relation": 10,
+    "max_triples": 400,
+    "avg_triple_recall": 0.32575757575757575,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": null,
+    "per_relation": 20,
+    "max_triples": 100,
+    "avg_triple_recall": 0.32575757575757575,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": null,
+    "per_relation": 20,
+    "max_triples": 200,
+    "avg_triple_recall": 0.32575757575757575,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": null,
+    "per_relation": 20,
+    "max_triples": 400,
+    "avg_triple_recall": 0.32575757575757575,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": null,
+    "per_relation": 5,
+    "max_triples": 100,
+    "avg_triple_recall": 0.32575757575757575,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": null,
+    "per_relation": 5,
+    "max_triples": 200,
+    "avg_triple_recall": 0.32575757575757575,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": null,
+    "per_relation": 5,
+    "max_triples": 400,
+    "avg_triple_recall": 0.32575757575757575,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": null,
+    "per_relation": 10,
+    "max_triples": 100,
+    "avg_triple_recall": 0.32575757575757575,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": null,
+    "per_relation": 10,
+    "max_triples": 200,
+    "avg_triple_recall": 0.32575757575757575,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": null,
+    "per_relation": 10,
+    "max_triples": 400,
+    "avg_triple_recall": 0.32575757575757575,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": null,
+    "per_relation": 20,
+    "max_triples": 100,
+    "avg_triple_recall": 0.32575757575757575,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": null,
+    "per_relation": 20,
+    "max_triples": 200,
+    "avg_triple_recall": 0.32575757575757575,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": null,
+    "per_relation": 20,
+    "max_triples": 400,
+    "avg_triple_recall": 0.32575757575757575,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": 15,
+    "per_relation": 5,
+    "max_triples": 100,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": 15,
+    "per_relation": 5,
+    "max_triples": 200,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": 15,
+    "per_relation": 5,
+    "max_triples": 400,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": 15,
+    "per_relation": 10,
+    "max_triples": 100,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": 15,
+    "per_relation": 10,
+    "max_triples": 200,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": 15,
+    "per_relation": 10,
+    "max_triples": 400,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": 15,
+    "per_relation": 20,
+    "max_triples": 100,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": 15,
+    "per_relation": 20,
+    "max_triples": 200,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": 15,
+    "per_relation": 20,
+    "max_triples": 400,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": 25,
+    "per_relation": 5,
+    "max_triples": 100,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": 25,
+    "per_relation": 5,
+    "max_triples": 200,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": 25,
+    "per_relation": 5,
+    "max_triples": 400,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": 25,
+    "per_relation": 10,
+    "max_triples": 100,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": 25,
+    "per_relation": 10,
+    "max_triples": 200,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": 25,
+    "per_relation": 10,
+    "max_triples": 400,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": 25,
+    "per_relation": 20,
+    "max_triples": 100,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": 25,
+    "per_relation": 20,
+    "max_triples": 200,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": 25,
+    "per_relation": 20,
+    "max_triples": 400,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": 40,
+    "per_relation": 5,
+    "max_triples": 100,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": 40,
+    "per_relation": 5,
+    "max_triples": 200,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": 40,
+    "per_relation": 5,
+    "max_triples": 400,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": 40,
+    "per_relation": 10,
+    "max_triples": 100,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": 40,
+    "per_relation": 10,
+    "max_triples": 200,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": 40,
+    "per_relation": 10,
+    "max_triples": 400,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": 40,
+    "per_relation": 20,
+    "max_triples": 100,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": 40,
+    "per_relation": 20,
+    "max_triples": 200,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": 40,
+    "per_relation": 20,
+    "max_triples": 400,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": null,
+    "per_relation": 5,
+    "max_triples": 100,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": null,
+    "per_relation": 5,
+    "max_triples": 200,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": null,
+    "per_relation": 5,
+    "max_triples": 400,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": null,
+    "per_relation": 10,
+    "max_triples": 100,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": null,
+    "per_relation": 10,
+    "max_triples": 200,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": null,
+    "per_relation": 10,
+    "max_triples": 400,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": null,
+    "per_relation": 20,
+    "max_triples": 100,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": null,
+    "per_relation": 20,
+    "max_triples": 200,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 2,
+    "hub_degree_threshold": null,
+    "per_relation": 20,
+    "max_triples": 400,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": 15,
+    "per_relation": 5,
+    "max_triples": 100,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": 15,
+    "per_relation": 5,
+    "max_triples": 200,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": 15,
+    "per_relation": 5,
+    "max_triples": 400,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": 15,
+    "per_relation": 10,
+    "max_triples": 100,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": 15,
+    "per_relation": 10,
+    "max_triples": 200,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": 15,
+    "per_relation": 10,
+    "max_triples": 400,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": 15,
+    "per_relation": 20,
+    "max_triples": 100,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": 15,
+    "per_relation": 20,
+    "max_triples": 200,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": 15,
+    "per_relation": 20,
+    "max_triples": 400,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": 25,
+    "per_relation": 5,
+    "max_triples": 100,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": 25,
+    "per_relation": 5,
+    "max_triples": 200,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": 25,
+    "per_relation": 5,
+    "max_triples": 400,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": 25,
+    "per_relation": 10,
+    "max_triples": 100,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": 25,
+    "per_relation": 10,
+    "max_triples": 200,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": 25,
+    "per_relation": 10,
+    "max_triples": 400,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": 25,
+    "per_relation": 20,
+    "max_triples": 100,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": 25,
+    "per_relation": 20,
+    "max_triples": 200,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": 25,
+    "per_relation": 20,
+    "max_triples": 400,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": 40,
+    "per_relation": 5,
+    "max_triples": 100,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": 40,
+    "per_relation": 5,
+    "max_triples": 200,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": 40,
+    "per_relation": 5,
+    "max_triples": 400,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": 40,
+    "per_relation": 10,
+    "max_triples": 100,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": 40,
+    "per_relation": 10,
+    "max_triples": 200,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": 40,
+    "per_relation": 10,
+    "max_triples": 400,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": 40,
+    "per_relation": 20,
+    "max_triples": 100,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": 40,
+    "per_relation": 20,
+    "max_triples": 200,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 3,
+    "hub_degree_threshold": 40,
+    "per_relation": 20,
+    "max_triples": 400,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": 15,
+    "per_relation": 5,
+    "max_triples": 100,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": 15,
+    "per_relation": 5,
+    "max_triples": 200,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": 15,
+    "per_relation": 5,
+    "max_triples": 400,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": 15,
+    "per_relation": 10,
+    "max_triples": 100,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": 15,
+    "per_relation": 10,
+    "max_triples": 200,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": 15,
+    "per_relation": 10,
+    "max_triples": 400,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": 15,
+    "per_relation": 20,
+    "max_triples": 100,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": 15,
+    "per_relation": 20,
+    "max_triples": 200,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": 15,
+    "per_relation": 20,
+    "max_triples": 400,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": 25,
+    "per_relation": 5,
+    "max_triples": 100,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": 25,
+    "per_relation": 5,
+    "max_triples": 200,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": 25,
+    "per_relation": 5,
+    "max_triples": 400,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": 25,
+    "per_relation": 10,
+    "max_triples": 100,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": 25,
+    "per_relation": 10,
+    "max_triples": 200,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": 25,
+    "per_relation": 10,
+    "max_triples": 400,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": 25,
+    "per_relation": 20,
+    "max_triples": 100,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": 25,
+    "per_relation": 20,
+    "max_triples": 200,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": 25,
+    "per_relation": 20,
+    "max_triples": 400,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": 40,
+    "per_relation": 5,
+    "max_triples": 100,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": 40,
+    "per_relation": 5,
+    "max_triples": 200,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": 40,
+    "per_relation": 5,
+    "max_triples": 400,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": 40,
+    "per_relation": 10,
+    "max_triples": 100,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": 40,
+    "per_relation": 10,
+    "max_triples": 200,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": 40,
+    "per_relation": 10,
+    "max_triples": 400,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": 40,
+    "per_relation": 20,
+    "max_triples": 100,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": 40,
+    "per_relation": 20,
+    "max_triples": 200,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  },
+  {
+    "max_radius": 4,
+    "hub_degree_threshold": 40,
+    "per_relation": 20,
+    "max_triples": 400,
+    "avg_triple_recall": 0.29545454545454547,
+    "n_items": 22
+  }
+]
