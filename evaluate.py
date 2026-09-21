@@ -197,3 +197,36 @@ def baseline_answer(question: str, chunks: list[tuple[str, str]], cfg: dict, llm
     prompt = (f"{schema.ANSWER_SYSTEM_PROMPT}\n\n[근거 원문 청크]\n{context}\n\n[질문]\n{question}")
     resp = llm.invoke(prompt)
     return resp.content, sources
+
+
+import re
+
+
+def judge_score(question: str, model_answer: str, gold_answer: str,
+                evidence: str, llm) -> float | None:
+    prompt = schema.JUDGE_PROMPT.format(question=question, model_answer=model_answer,
+                                        gold_answer=gold_answer, evidence=evidence)
+    resp = llm.invoke(prompt)
+    m = re.search(r"\b(1\.0|0\.5|0\.0)\b", resp.content)
+    return float(m.group(1)) if m else None
+
+
+def classify_failure(item: dict, route_actual: str, idx: dict, ret: dict, gen: dict) -> str:
+    """앞 조건이 걸리면 뒤는 보지 않는다. 순서를 고정한다(설계서 6.4)."""
+    if route_actual != item["route"]:
+        return "routing"
+    if not ret["seeds"]:
+        return "seeding"
+    if idx["exact"] < 1.0:
+        return "index"
+    if ret["triple_recall"] < 1.0:
+        return "retrieval"
+    if gen["decision"] == "abstain" and idx["exact"] == 1.0:
+        return "abstain"
+    if gen["score"] is not None and gen["score"] < 1.0:
+        return "generation"
+    return "ok"
+
+
+LAYER_3_MAP = {"index": "색인", "routing": "탐색", "seeding": "탐색", "retrieval": "탐색",
+               "abstain": "생성", "generation": "생성", "ok": "정상"}
