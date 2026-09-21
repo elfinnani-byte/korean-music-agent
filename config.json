@@ -28,6 +28,7 @@
     "per_era_min": 14,
     "min_body_chars": 1200,
     "link_limit_per_seed": 300,
+    "candidate_pool_cap": 1200,
     "request_delay_sec": 1.0,
     "retry": {"max_attempts": 5, "backoff_base_sec": 2.0, "respect_retry_after": true},
     "user_agent": "my-graph-agent/1.0 (educational project)",

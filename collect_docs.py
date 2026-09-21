@@ -144,7 +144,10 @@ def main() -> None:
     print(f"2홉 후보 {len(ranked)}건, 그중 2개 이상 시드가 가리키고 "
           f"시드가 아닌 것 {len(multi)}건")
 
-    cats_map = client.categories_bulk(multi[:600])
+    # candidate_pool_cap 을 넘기면 뒤쪽 후보가 분류 확인조차 못 받고 버려진다.
+    # 실제로 959건 중 상위 600건만 보다가 1990s·2020s 연대 쿼터를 못 채운
+    # 적이 있어, 후보 전체가 들어가도록 여유 있게 잡는다.
+    cats_map = client.categories_bulk(multi[:cc["candidate_pool_cap"]])
     survivors: list[tuple[str, str]] = []
     for title, cats in cats_map.items():
         if title in saved_titles or not is_music_doc(title, cats):
