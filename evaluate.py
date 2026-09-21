@@ -10,6 +10,7 @@ if sys.platform == "win32":
         pass
 
 import normalize as nz
+import schema
 
 
 def _find_node(g, name: str) -> str | None:
@@ -118,3 +119,81 @@ def sweep(g, items: list[dict], cfg: dict) -> list[dict]:
                      "avg_triple_recall": sum(recalls) / len(recalls) if recalls else 0.0,
                      "n_items": len(recalls)})
     return rows
+
+
+import math
+from pathlib import Path
+
+try:
+    from kiwipiepy import Kiwi
+    _kiwi = Kiwi()
+except Exception:
+    _kiwi = None
+
+
+def tokenize(text: str) -> list[str]:
+    """형태소 분석기를 1순위로 쓰고 실패하면 문자 2-gram 으로 폴백한다.
+       공백 분리는 한국어 BM25 재현율을 반토막 낸다(설계서 6.6)."""
+    if _kiwi is not None:
+        return [t.form for t in _kiwi.tokenize(text) if not t.tag.startswith("S")]
+    return [text[i:i + 2] for i in range(len(text) - 1)]
+
+
+def chunk_corpus(docs: list[tuple[str, str]], chunk_chars: int = 800) -> list[tuple[str, str]]:
+    chunks = []
+    for title, body in docs:
+        for i in range(0, len(body), chunk_chars):
+            chunks.append((title, body[i:i + chunk_chars]))
+    return chunks
+
+
+def bm25_search(query: str, chunks: list[tuple[str, str]], k: int = 6,
+                k1: float = 1.5, b: float = 0.75) -> list[tuple[str, str, float]]:
+    q_terms = tokenize(query)
+    doc_terms = [tokenize(body) for _, body in chunks]
+    n = len(chunks)
+    avgdl = sum(len(d) for d in doc_terms) / n if n else 0
+    df: dict[str, int] = {}
+    for terms in doc_terms:
+        for term in set(terms):
+            df[term] = df.get(term, 0) + 1
+
+    scores = []
+    for (title, body), terms in zip(chunks, doc_terms):
+        tf: dict[str, int] = {}
+        for t in terms:
+            tf[t] = tf.get(t, 0) + 1
+        dl = len(terms)
+        score = 0.0
+        for term in q_terms:
+            if term not in tf:
+                continue
+            idf = math.log(1 + (n - df.get(term, 0) + 0.5) / (df.get(term, 0) + 0.5))
+            freq = tf[term]
+            score += idf * (freq * (k1 + 1)) / (freq + k1 * (1 - b + b * dl / max(avgdl, 1)))
+        scores.append((title, body, score))
+    scores.sort(key=lambda x: -x[2])
+    return scores[:k]
+
+
+def load_corpus_chunks(docs_dir: str, chunk_chars: int = 800) -> list[tuple[str, str]]:
+    docs = []
+    for p in sorted(Path(docs_dir).glob("*.md")):
+        text = p.read_text(encoding="utf-8")
+        body = text.split("\n\n", 2)[-1]
+        title = text.splitlines()[0].removeprefix("# ").strip()
+        docs.append((title, body))
+    return chunk_corpus(docs, chunk_chars)
+
+
+def baseline_answer(question: str, chunks: list[tuple[str, str]], cfg: dict, llm) -> tuple[str, list[str]]:
+    """같은 답변 프롬프트 뼈대를 쓰되 근거를 삼중항 대신 원문 청크로 준다.
+       공정성 조건(설계서 6.6): 같은 코퍼스·같은 청크 크기·같은 LLM·같은
+       프롬프트 뼈대·같은 심판."""
+    k = cfg["eval"]["baseline"]["k"]
+    hits = bm25_search(question, chunks, k=k)
+    context = "\n\n".join(f"[출처: {title}]\n{body}" for title, body, _ in hits)
+    sources = [title for title, _, _ in hits]
+    prompt = (f"{schema.ANSWER_SYSTEM_PROMPT}\n\n[근거 원문 청크]\n{context}\n\n[질문]\n{question}")
+    resp = llm.invoke(prompt)
+    return resp.content, sources
