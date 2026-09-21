@@ -1,0 +1,307 @@
+[
+  {
+    "split": "holdout",
+    "fingerprint": {
+      "frozen": true,
+      "frozen_at": "2026-09-22T07:11:58.875562+09:00",
+      "freeze_commit": "fc05bd83c9bdd7f1f4cee20bcfc1198608beb613",
+      "config_hash": "6a1c0dda24658893ed2eba382d473b6ffa56460537cf4576373538ebc3914b26",
+      "schema_version": "838583b287ed",
+      "prompt_version": "895d0f2a20da",
+      "goldenset_hash": "0391ca60801095391e2e7771506a39b5ecca3f21611ff688de65b15cfb82690a",
+      "graph_hash": "3647b287638400d6cfc5d1c982a9abae0820ffac02a604a0de2032c7837771c7"
+    },
+    "items": [
+      {
+        "id": "Q04",
+        "hops": 1,
+        "era_cross": false,
+        "route_expected": "local",
+        "route_actual": "path",
+        "idx": {
+          "exact": 1.0,
+          "relaxed": 1.0,
+          "node": 1.0,
+          "none": 0.0
+        },
+        "triple_recall": 0.0,
+        "path_prefix_recall": 1.0,
+        "break_hop": null,
+        "matched_path_index": 0,
+        "decision": "abstain",
+        "llm_answer_called": true,
+        "scores": [
+          0.0
+        ],
+        "score": 0.0,
+        "failure_layer": "routing",
+        "layer3": "탐색",
+        "baseline": {
+          "answer": "근거가 부족합니다.",
+          "score": 0.0
+        }
+      },
+      {
+        "id": "Q06",
+        "hops": 1,
+        "era_cross": true,
+        "route_expected": "path",
+        "route_actual": "local",
+        "idx": {
+          "exact": 1.0,
+          "relaxed": 1.0,
+          "node": 1.0,
+          "none": 0.0
+        },
+        "triple_recall": 0.6666666666666666,
+        "path_prefix_recall": 0.5,
+        "break_hop": 2,
+        "matched_path_index": 1,
+        "decision": "answer",
+        "llm_answer_called": true,
+        "scores": [
+          1.0
+        ],
+        "score": 1.0,
+        "failure_layer": "routing",
+        "layer3": "탐색",
+        "baseline": {
+          "answer": "답: 이문세\n경로: 빅뱅 -[리메이크]-> 붉은 노을 -[원곡자]-> 이문세\n근거: (\"붉은 노을\", \"원곡자\", \"이문세\"), (\"빅뱅\", \"리메이크\", \"붉은 노을\")",
+          "score": 1.0
+        }
+      },
+      {
+        "id": "Q11",
+        "hops": 2,
+        "era_cross": false,
+        "route_expected": "path",
+        "route_actual": "path",
+        "idx": {
+          "exact": 0.5,
+          "relaxed": 1.0,
+          "node": 1.0,
+          "none": 0.0
+        },
+        "triple_recall": 0.0,
+        "path_prefix_recall": 0.5,
+        "break_hop": 2,
+        "matched_path_index": 0,
+        "decision": "abstain",
+        "llm_answer_called": true,
+        "scores": [
+          1.0
+        ],
+        "score": 1.0,
+        "failure_layer": "index",
+        "layer3": "색인",
+        "baseline": {
+          "answer": "답: 싸이6甲 Part 1\n경로: 강남스타일 -[수록]-> 싸이6甲 Part 1\n근거: (\"강남스타일\", \"의 곡이 수록된\", \"싸이6甲 Part 1\")",
+          "score": 1.0
+        }
+      },
+      {
+        "id": "Q13",
+        "hops": 2,
+        "era_cross": false,
+        "route_expected": "path",
+        "route_actual": "path",
+        "idx": {
+          "exact": 0.0,
+          "relaxed": 0.0,
+          "node": 1.0,
+          "none": 0.0
+        },
+        "triple_recall": 0.0,
+        "path_prefix_recall": 0.0,
+        "break_hop": 1,
+        "matched_path_index": 0,
+        "decision": "abstain",
+        "llm_answer_called": false,
+        "scores": [
+          1.0
+        ],
+        "score": 1.0,
+        "failure_layer": "index",
+        "layer3": "색인",
+        "baseline": {
+          "answer": "답: \"너를 위해\"\n경로: 첸, 백현, 시우민 -[참여]-> \"너를 위해\"\n근거: (첸, 참여, \"너를 위해\"), (백현, 참여, \"너를 위해\"), (시우민, 참여, \"너를 위해\")",
+          "score": 0.0
+        }
+      },
+      {
+        "id": "Q14",
+        "hops": 2,
+        "era_cross": false,
+        "route_expected": "path",
+        "route_actual": "local",
+        "idx": {
+          "exact": 0.0,
+          "relaxed": 0.0,
+          "node": 1.0,
+          "none": 0.0
+        },
+        "triple_recall": 0.0,
+        "path_prefix_recall": 0.0,
+        "break_hop": 1,
+        "matched_path_index": 0,
+        "decision": "abstain",
+        "llm_answer_called": false,
+        "scores": [
+          1.0
+        ],
+        "score": 1.0,
+        "failure_layer": "routing",
+        "layer3": "탐색",
+        "baseline": {
+          "answer": "근거가 부족합니다.",
+          "score": 1.0
+        }
+      },
+      {
+        "id": "Q20",
+        "hops": 3,
+        "era_cross": false,
+        "route_expected": "path",
+        "route_actual": "path",
+        "idx": {
+          "exact": 0.6666666666666666,
+          "relaxed": 0.6666666666666666,
+          "node": 1.0,
+          "none": 0.0
+        },
+        "triple_recall": 0.0,
+        "path_prefix_recall": 0.0,
+        "break_hop": 1,
+        "matched_path_index": 0,
+        "decision": "abstain",
+        "llm_answer_called": false,
+        "scores": [
+          1.0
+        ],
+        "score": 1.0,
+        "failure_layer": "index",
+        "layer3": "색인",
+        "baseline": {
+          "answer": "답: \"붉은 노을\"\n경로: 지드래곤 -[소속]-> 빅뱅 -[두 번째 정규 앨범 발매 및 수록]-> \"붉은 노을\"\n근거: (\"빅뱅\", \"두 번째 정규 앨범\", \"《Remember》\"), (\"《Remember》\", \"수록곡\", \"붉은 노을\"), (\"지드래곤\", \"소속\", \"빅뱅\")",
+          "score": 1.0
+        }
+      },
+      {
+        "id": "Q21",
+        "hops": 3,
+        "era_cross": false,
+        "route_expected": "path",
+        "route_actual": "path",
+        "idx": {
+          "exact": 0.3333333333333333,
+          "relaxed": 0.3333333333333333,
+          "node": 1.0,
+          "none": 0.0
+        },
+        "triple_recall": 0.0,
+        "path_prefix_recall": 0.0,
+        "break_hop": 1,
+        "matched_path_index": 0,
+        "decision": "abstain",
+        "llm_answer_called": false,
+        "scores": [
+          0.0
+        ],
+        "score": 0.0,
+        "failure_layer": "index",
+        "layer3": "색인",
+        "baseline": {
+          "answer": "답: SOLO DAY\n경로: B1A4 -[리더가 작사·작곡한 타이틀곡 \"SOLO DAY\"가 수록]-> SOLO DAY\n근거: (\"SOLO DAY\", \"수록\", \"SOLO DAY\"), (\"SOLO DAY\", \"타이틀곡\", \"SOLO DAY\"), (\"SOLO DAY\", \"작사·작곡\", \"진영\")",
+          "score": 0.0
+        }
+      },
+      {
+        "id": "Q23",
+        "hops": null,
+        "era_cross": false,
+        "route_expected": "reject",
+        "route_actual": "reject",
+        "idx": {
+          "exact": 1.0,
+          "relaxed": 1.0,
+          "node": 1.0,
+          "none": 0.0
+        },
+        "triple_recall": 1.0,
+        "path_prefix_recall": 1.0,
+        "break_hop": null,
+        "matched_path_index": 0,
+        "decision": "abstain",
+        "llm_answer_called": false,
+        "scores": [
+          1.0
+        ],
+        "score": 1.0,
+        "failure_layer": "seeding",
+        "layer3": "탐색",
+        "baseline": {
+          "answer": "근거가 부족합니다.",
+          "score": 1.0
+        }
+      },
+      {
+        "id": "Q24",
+        "hops": null,
+        "era_cross": false,
+        "route_expected": "path",
+        "route_actual": "path",
+        "idx": {
+          "exact": 1.0,
+          "relaxed": 1.0,
+          "node": 1.0,
+          "none": 0.0
+        },
+        "triple_recall": 1.0,
+        "path_prefix_recall": 1.0,
+        "break_hop": null,
+        "matched_path_index": 0,
+        "decision": "abstain",
+        "llm_answer_called": true,
+        "scores": [
+          1.0
+        ],
+        "score": 1.0,
+        "failure_layer": "abstain",
+        "layer3": "생성",
+        "baseline": {
+          "answer": "근거가 부족합니다",
+          "score": 1.0
+        }
+      },
+      {
+        "id": "Q25",
+        "hops": null,
+        "era_cross": false,
+        "route_expected": "path",
+        "route_actual": "path",
+        "idx": {
+          "exact": 1.0,
+          "relaxed": 1.0,
+          "node": 1.0,
+          "none": 0.0
+        },
+        "triple_recall": 1.0,
+        "path_prefix_recall": 1.0,
+        "break_hop": null,
+        "matched_path_index": 0,
+        "decision": "abstain",
+        "llm_answer_called": false,
+        "scores": [
+          1.0
+        ],
+        "score": 1.0,
+        "failure_layer": "abstain",
+        "layer3": "생성",
+        "baseline": {
+          "answer": "근거가 부족합니다.",
+          "score": 1.0
+        }
+      }
+    ]
+  }
+]
