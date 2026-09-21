@@ -358,12 +358,23 @@ def ask(question: str, g, cfg: dict, route_llm=None, answer_llm=None) -> RAGStat
         return state
 
     if state["route"] == "global":
-        # 전역 검색은 선택 확장(Task 18~19)이다. 아직 연결 전이면 안전하게
-        # 기권한다 — 없는 기능을 있는 척 답하지 않는다.
-        state["decision"] = "abstain"
-        state["abstain_reason"] = "no_supported_path"
-        state["llm_answer_called"] = False
-        state["answer"] = "전역 검색은 아직 연결되지 않았습니다."
+        report_path = Path(cfg["paths"]["output_dir"]) / "community_reports.json"
+        if not report_path.exists():
+            state["decision"] = "abstain"
+            state["abstain_reason"] = "no_supported_path"
+            state["llm_answer_called"] = False
+            state["answer"] = "커뮤니티 보고서가 아직 생성되지 않았습니다. community.build_reports() 를 먼저 실행하세요."
+            _log_run(state, cfg)
+            return state
+        reports = _json.loads(report_path.read_text(encoding="utf-8"))
+        top = select_top_reports(question, reports, k=5)
+        state["reports"] = top
+        context = reduce_reports(top)
+        answer, decision, called = synthesize(question, context, [], answer_llm)
+        state["context"], state["answer"], state["decision"], state["llm_answer_called"] = \
+            context, answer, decision, called
+        if decision == "abstain":
+            state["abstain_reason"] = "no_supported_path"
         _log_run(state, cfg)
         return state
 
@@ -448,6 +459,17 @@ def build_graph_app(g, cfg: dict, route_llm=None, answer_llm=None):
         return {**state, "decision": "abstain", "abstain_reason": reason,
                 "llm_answer_called": False, "answer": insufficient_answer(gap)}
 
+    def n_global_map(state):
+        report_path = Path(cfg["paths"]["output_dir"]) / "community_reports.json"
+        if not report_path.exists():
+            return {**state, "reports": [], "abstain_reason": "no_supported_path"}
+        reports = _json.loads(report_path.read_text(encoding="utf-8"))
+        return {**state, "reports": select_top_reports(state["question"], reports, k=5)}
+
+    def n_global_reduce(state):
+        context = reduce_reports(state["reports"])
+        return {**state, "context": context, "sources": []}
+
     sg = StateGraph(RAGState)
     sg.add_node("n_route", n_route)
     sg.add_node("n_find_seeds", n_find_seeds)
@@ -455,17 +477,47 @@ def build_graph_app(g, cfg: dict, route_llm=None, answer_llm=None):
     sg.add_node("n_build_context", n_build_context)
     sg.add_node("n_synthesize", n_synthesize)
     sg.add_node("n_insufficient", n_insufficient)
+    sg.add_node("n_global_map", n_global_map)
+    sg.add_node("n_global_reduce", n_global_reduce)
 
     sg.add_edge(START, "n_route")
     sg.add_conditional_edges("n_route", lambda s: s["route"],
                              {"local": "n_find_seeds", "path": "n_find_seeds",
-                              "global": "n_insufficient", "vector": "n_find_seeds",
+                              "global": "n_global_map", "vector": "n_find_seeds",
                               "reject": "n_insufficient"})
     sg.add_conditional_edges("n_find_seeds", lambda s: "ok" if s["seeds"] else "empty",
                              {"ok": "n_retrieve", "empty": "n_insufficient"})
     sg.add_conditional_edges("n_retrieve", lambda s: "gap" if s["gap_rels"] else "ok",
                              {"gap": "n_insufficient", "ok": "n_build_context"})
+    sg.add_conditional_edges("n_global_map", lambda s: "ok" if s["reports"] else "empty",
+                             {"ok": "n_global_reduce", "empty": "n_insufficient"})
+    sg.add_edge("n_global_reduce", "n_synthesize")
     sg.add_edge("n_build_context", "n_synthesize")
     sg.add_edge("n_synthesize", END)
     sg.add_edge("n_insufficient", END)
     return sg
+
+
+def select_top_reports(question: str, reports: list[dict], k: int = 5) -> list[dict]:
+    """질문과 커뮤니티 보고서의 키워드 중첩으로 상위 k 건을 고른다.
+       LLM 을 부르지 않는다(설계서 5.1 n_global_map 은 'LLM 없음')."""
+    import re
+
+    q_tokens = set(re.findall(r"[가-힣]{2,}", question))
+    scored = []
+    for r in reports:
+        text = r["title"] + " " + r["summary"]
+        r_tokens = set(re.findall(r"[가-힣]{2,}", text))
+        overlap = len(q_tokens & r_tokens)
+        scored.append((overlap, r))
+    scored.sort(key=lambda x: -x[0])
+    return [r for _, r in scored[:k]]
+
+
+def reduce_reports(reports: list[dict]) -> str:
+    lines = []
+    for r in reports:
+        lines.append(f"[{r['title']}] {r['summary']}")
+        for f in r.get("findings", []):
+            lines.append(f"  - {f}")
+    return "\n".join(lines)
