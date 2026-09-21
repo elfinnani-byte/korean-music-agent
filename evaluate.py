@@ -230,3 +230,67 @@ def classify_failure(item: dict, route_actual: str, idx: dict, ret: dict, gen: d
 
 LAYER_3_MAP = {"index": "색인", "routing": "탐색", "seeding": "탐색", "retrieval": "탐색",
                "abstain": "생성", "generation": "생성", "ok": "정상"}
+
+
+import statistics
+
+import agent as _agent
+
+
+def evaluate_item(item: dict, g, cfg: dict, route_llm, answer_llm, judge_llm,
+                  chunks: list[tuple[str, str]] | None = None) -> dict:
+    result = _agent.ask(item["question"], g=g, cfg=cfg, route_llm=route_llm, answer_llm=answer_llm)
+
+    idx = index_score(g, item.get("expected_triples", []))
+    t_recall = triple_recall(result["triples"], item.get("expected_triples", []))
+    p_recall, break_hop, matched_idx = (path_prefix_recall(item["expected_paths"], result["trace"])
+                                        if item.get("expected_paths") else (1.0, None, 0))
+
+    evidence = " ".join(e["quote"] for e in item.get("evidence", []))
+    gold = item.get("answer") or "기권해야 함"
+    scores = []
+    for _ in range(cfg["eval"]["judge_repeats"]):
+        s = judge_score(item["question"], result["answer"], gold, evidence, judge_llm)
+        scores.append(s)
+    valid_scores = [s for s in scores if s is not None]
+
+    gen = {"decision": result["decision"],
+          "score": statistics.mean(valid_scores) if valid_scores else None}
+    ret = {"seeds": result["seeds"], "triple_recall": t_recall}
+    layer = classify_failure(item, result["route"], idx, ret, gen)
+
+    baseline = None
+    if chunks is not None:
+        b_answer, b_sources = baseline_answer(item["question"], chunks, cfg, answer_llm)
+        b_scores = [judge_score(item["question"], b_answer, gold, evidence, judge_llm)
+                   for _ in range(cfg["eval"]["judge_repeats"])]
+        b_valid = [s for s in b_scores if s is not None]
+        baseline = {"answer": b_answer, "score": statistics.mean(b_valid) if b_valid else None}
+
+    return {"id": item["id"], "hops": item.get("hops"), "era_cross": item.get("era_cross"),
+           "route_expected": item["route"], "route_actual": result["route"],
+           "idx": idx, "triple_recall": t_recall, "path_prefix_recall": p_recall,
+           "break_hop": break_hop, "matched_path_index": matched_idx,
+           "decision": result["decision"], "llm_answer_called": result["llm_answer_called"],
+           "scores": scores, "score": gen["score"], "failure_layer": layer,
+           "layer3": LAYER_3_MAP[layer], "baseline": baseline}
+
+
+def hop_summary_table(rows: list[dict]) -> dict[int, dict]:
+    """rows 는 evaluate_item() 의 반환값 그대로다 — idx 는 중첩
+       딕셔너리이고 score 는 심판 전원 실패 시 None 일 수 있다.
+       None 은 평균에서 제외한다(0으로 섞지 않는다, 설계서 6.3)."""
+    by_hop: dict[int, list[dict]] = {}
+    for r in rows:
+        by_hop.setdefault(r["hops"], []).append(r)
+    table = {}
+    for hops, group in by_hop.items():
+        scored = [r["score"] for r in group if r["score"] is not None]
+        table[hops] = {
+            "n": len(group),
+            "avg_idx_exact": sum(r["idx"]["exact"] for r in group) / len(group),
+            "avg_triple_recall": sum(r["triple_recall"] for r in group) / len(group),
+            "avg_path_prefix_recall": sum(r["path_prefix_recall"] for r in group) / len(group),
+            "avg_score": sum(scored) / len(scored) if scored else None,
+        }
+    return table
