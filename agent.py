@@ -252,3 +252,39 @@ def expand_one_hop(g, state: dict, cfg: dict) -> dict:
         "frontier": new_frontier,
         "visited": sorted(visited),
     }
+
+
+def run_retrieval(g, seeds: list[str], required_rels: list[list[str]], cfg: dict,
+                  max_radius_override: int | None = None,
+                  hub_degree_threshold_override: int | None = None,
+                  per_relation_override: int | None = None,
+                  max_triples_override: int | None = None) -> dict:
+    """expand_one_hop 을 반경이 다하거나 관계 공백이 없어질 때까지 반복한다.
+       LLM 을 부르지 않는 순수 함수다 — P7 스윕이 override 인자로 파라미터를
+       바꿔 가며 이 함수를 직접 호출한다."""
+    local_cfg = {**cfg, "retrieval": {**cfg["retrieval"]}}
+    if max_radius_override is not None:
+        local_cfg["retrieval"]["max_radius"] = max_radius_override
+    if hub_degree_threshold_override is not None:
+        local_cfg["retrieval"]["hub_degree_threshold"] = hub_degree_threshold_override
+    if per_relation_override is not None:
+        local_cfg["retrieval"]["per_relation"] = per_relation_override
+    if max_triples_override is not None:
+        local_cfg["retrieval"]["max_triples"] = max_triples_override
+
+    state = {"triples": [], "trace": [], "frontier": list(seeds),
+             "visited": [], "seeds": list(seeds), "gap_rels": []}
+    max_radius = local_cfg["retrieval"]["max_radius"]
+    radius = 1
+    while True:
+        state["radius"] = radius
+        upd = expand_one_hop(g, state, local_cfg)
+        state = {**state, **upd}
+        gaps = relation_gap({"required_rels": required_rels, "triples": state["triples"]})
+        state["gap_rels"] = [r for group in gaps for r in group]
+        if not gaps or radius >= max_radius or not state["frontier"]:
+            break
+        radius += 1
+
+    return {"triples": state["triples"], "trace": state["trace"],
+            "radius_used": radius, "gap_rels": gaps}
