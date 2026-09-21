@@ -69,13 +69,15 @@ def test_config_has_eval_sweep_grid_matching_design_doc():
     assert sweep["max_triples"] == [100, 200, 400]
 
 
-def test_config_has_unfrozen_holdout_fingerprint_slots():
+def test_config_has_frozen_holdout_fingerprint():
+    """Task 21(P9)에서 실제로 동결한 뒤에는 이 슬롯이 채워져 있어야 한다 -
+       빈 슬롯 존재만 확인하던 이전 버전은 동결 전 상태를 검증했다."""
     cfg = config_loader.load()
     h = cfg["eval"]["holdout"]
-    assert h["frozen"] is False
+    assert h["frozen"] is True
     for k in ("frozen_at", "freeze_commit", "config_hash", "schema_version",
               "prompt_version", "goldenset_hash", "graph_hash"):
-        assert k in h
+        assert h[k]
 
 
 def test_validate_rejects_non_alphabetical_origin_key():

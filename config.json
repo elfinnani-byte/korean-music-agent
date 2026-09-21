@@ -208,9 +208,9 @@
     },
     "holdout": {
       "frozen": true,
-      "frozen_at": "2026-09-22T07:10:12.461826+09:00",
-      "freeze_commit": "7b5b5151940715638a8eb3675a27d10d52a79b2b",
-      "config_hash": "5fa1de53774ecfc947eb47f8df38f2b903e457e3db930e0fc0615ed9dd0a73b2",
+      "frozen_at": "2026-09-22T07:11:58.875562+09:00",
+      "freeze_commit": "fc05bd83c9bdd7f1f4cee20bcfc1198608beb613",
+      "config_hash": "6a1c0dda24658893ed2eba382d473b6ffa56460537cf4576373538ebc3914b26",
       "schema_version": "838583b287ed",
       "prompt_version": "895d0f2a20da",
       "goldenset_hash": "0391ca60801095391e2e7771506a39b5ecca3f21611ff688de65b15cfb82690a",
