@@ -214,7 +214,7 @@
       "schema_version": "838583b287ed",
       "prompt_version": "895d0f2a20da",
       "goldenset_hash": "0391ca60801095391e2e7771506a39b5ecca3f21611ff688de65b15cfb82690a",
-      "graph_hash": "3647b287638400d6cfc5d1c982a9abae0820ffac02a604a0de2032c7837771c7"
+      "graph_hash": "f16b7131386d527aebc3a05d2b5ea27c21492d1b386392bc366d129aa068ff83"
     },
     "baseline": {
       "method": "bm25",

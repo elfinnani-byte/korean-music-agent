@@ -1,1 +1,10 @@
 * text=auto eol=lf
+
+# freeze_holdout 이 SHA-256으로 해시하는 파일들은 체크아웃 환경(OS·git
+# 설정)에 따라 줄바꿈이 달라지면 안 된다 - eol=lf 조차 플랫폼별 smudge
+# 필터 적용 여부가 갈릴 수 있다는 게 실측으로 드러나(같은 커밋, 같은
+# 원격인데 clone 마다 output/graph.json 체크아웃 바이트가 달랐다),
+# 아예 텍스트 변환 자체를 끈다 - git이 커밋된 blob 그대로를 내려준다.
+config.json -text
+data/goldenset.json -text
+output/graph.json -text
