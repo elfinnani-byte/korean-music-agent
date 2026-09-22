@@ -11,9 +11,9 @@ import json
 import re
 from pathlib import Path
 
+import networkx as nx
+import plotly.graph_objects as go
 import streamlit as st
-import streamlit_agraph
-from streamlit_agraph import Node, Edge, Config
 
 import agent
 import config_loader
@@ -73,18 +73,6 @@ def load_name_to_type():
 NAME_TO_TYPE = load_name_to_type()
 
 
-def agraph_with_key(nodes, edges, config, key: str):
-    """streamlit_agraph.agraph() 는 내부적으로 key 를 받는 컴포넌트를 감싸고도
-       공개 함수에서 key 인자를 흘려보내지 않는다. 채팅 턴마다 그래프를 여러 개
-       그리면 동일한 자동생성 ID로 StreamlitDuplicateElementId 가 난다(실측).
-       원본 agraph() 와 동일한 본문에 key 만 추가해 턴별로 고유하게 만든다."""
-    nodes_data = [n.to_dict() for n in nodes]
-    edges_data = [e.to_dict() for e in edges]
-    data_json = json.dumps({"nodes": nodes_data, "edges": edges_data})
-    config_json = json.dumps(config.__dict__)
-    return streamlit_agraph._agraph(data=data_json, config=config_json, key=key)
-
-
 def _to_polite(sentence: str) -> str:
     """ANSWER_SYSTEM_PROMPT 에 존댓말 지시를 넣어도 LLM이 항상 따르지는
        않는다(실측: "이문세가 '붉은 노을'의 원곡을 불렀다." 처럼 반말이 섞여
@@ -138,12 +126,14 @@ def parse_used_triples(answer_text: str) -> set[tuple[str, str, str]]:
 
 
 def render_graph(state: dict, key: str):
-    """드래그·확대·물리 시뮬레이션이 되는 실제 인터랙티브 지식그래프(온톨로지)
-       뷰다. 정적 이미지가 아니라 vis.js 캔버스를 그대로 내장한다(streamlit-agraph).
-       노드는 스키마 타입별로 색을 칠하고, ANSWER_SYSTEM_PROMPT 가 강제하는
-       '근거: (h, r, t), ...' 줄을 파싱해 실제로 답변에 인용된 노드·엣지만
-       빨간 테두리/빨간 선으로 강조한다 — 탐색은 됐지만 답변엔 안 쓰인 나머지는
-       옅게 표시해 구분한다."""
+    """지식그래프 뷰. streamlit-agraph(vis.js 임베드)로 먼저 만들었으나,
+       expander+tabs 안에 접힌 채로 마운트되면 컴포넌트가 높이를 0으로
+       측정해 버리고 나중에 펼쳐도 다시 재기 않는 문제를 실측으로 확인했다
+       (그 과정에서 CSS 폭 값 오류·null 좌표 직렬화·key 미전달·vis-network
+       옵션 오류까지 5개를 고쳤지만 이 마지막 문제는 컴포넌트 라이브러리
+       자체의 마운트-시점 높이 감지 한계였다). 드래그는 못 하지만 확대/축소·
+       호버가 되고 Streamlit 네이티브 위젯이라 탭/expander 안에서도 항상
+       정상적으로 그려지는 Plotly로 바꿨다."""
     triples = state["triples"]
     if not triples:
         st.caption("표시할 근거 삼중항이 없습니다.")
@@ -151,57 +141,67 @@ def render_graph(state: dict, key: str):
 
     used = parse_used_triples(state["answer"]) if state["decision"] != "abstain" else set()
     seed_names = {g.nodes[s]["name"] for s in state.get("seeds", []) if s in g.nodes}
-
-    node_ids = set()
-    nodes, edges = [], []
     used_node_names = {h for h, r, t in used} | {t for h, r, t in used}
+
+    nx_g = nx.DiGraph()
     for t in triples:
-        for name in (t["h"], t["t"]):
-            if name in node_ids:
+        nx_g.add_edge(t["h"], t["t"], relation=t["r"],
+                      is_used=(t["h"], t["r"], t["t"]) in used)
+    pos = nx.spring_layout(nx_g, seed=42, k=1.4 / max(len(nx_g.nodes()) ** 0.5, 1))
+
+    used_edge_x, used_edge_y = [], []
+    other_edge_x, other_edge_y = [], []
+    mid_x, mid_y, mid_text = [], [], []
+    for u, v, d in nx_g.edges(data=True):
+        x0, y0 = pos[u]
+        x1, y1 = pos[v]
+        target = (used_edge_x, used_edge_y) if d["is_used"] else (other_edge_x, other_edge_y)
+        target[0].extend([x0, x1, None])
+        target[1].extend([y0, y1, None])
+        if d["is_used"]:
+            mid_x.append((x0 + x1) / 2)
+            mid_y.append((y0 + y1) / 2)
+            mid_text.append(d["relation"])
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=other_edge_x, y=other_edge_y, mode="lines",
+                             line=dict(width=1, color="#D0D0D0", dash="dot"),
+                             hoverinfo="none", showlegend=False))
+    fig.add_trace(go.Scatter(x=used_edge_x, y=used_edge_y, mode="lines",
+                             line=dict(width=2.5, color="#D62728"),
+                             hoverinfo="none", name="답변에 실제로 사용된 관계"))
+    fig.add_trace(go.Scatter(x=mid_x, y=mid_y, mode="text", text=mid_text,
+                             textfont=dict(size=10, color="#D62728"),
+                             hoverinfo="none", showlegend=False))
+
+    for node_type, color in TYPE_COLORS.items():
+        xs, ys, labels, sizes, line_widths, line_colors = [], [], [], [], [], []
+        for n in nx_g.nodes():
+            if NAME_TO_TYPE.get(n, "Unknown") != node_type:
                 continue
-            node_ids.add(name)
-            node_type = NAME_TO_TYPE.get(name, "Unknown")
-            is_seed = name in seed_names
-            is_used_node = name in used_node_names
-            # x/y/fixed는 시드 노드에만 넣는다 - 나머지에 x=None/y=None을
-            # 명시적으로 넘기면 그대로 null이 직렬화되어 vis.js가 좌표를
-            # NaN으로 계산해 캔버스 전체가 빈 화면으로 보이는 버그가 있었다(실측).
-            extra = {"fixed": True, "x": 0, "y": 0} if is_seed else {}
-            nodes.append(Node(
-                id=name, label=name,
-                size=20 if is_seed else (14 if is_used_node else 9),
-                color=TYPE_COLORS.get(node_type, TYPE_COLORS["Unknown"]),
-                borderWidth=4 if is_seed else (2 if is_used_node else 1),
-                borderWidthSelected=5,
-                font={"color": "#D62728" if is_used_node else "#666666", "size": 12},
-                **extra,
-            ))
-        is_used_edge = (t["h"], t["r"], t["t"]) in used
-        edges.append(Edge(
-            source=t["h"], target=t["t"], label=t["r"],
-            color="#D62728" if is_used_edge else "#D0D0D0",
-            width=3 if is_used_edge else 1,
+            x, y = pos[n]
+            xs.append(x); ys.append(y); labels.append(n)
+            is_seed = n in seed_names
+            sizes.append(28 if is_seed else (20 if n in used_node_names else 14))
+            line_widths.append(3 if is_seed else 1)
+            line_colors.append("#D62728" if is_seed else "#FFFFFF")
+        if not xs:
+            continue
+        fig.add_trace(go.Scatter(
+            x=xs, y=ys, mode="markers+text", text=labels, textposition="top center",
+            textfont=dict(size=10),
+            marker=dict(size=sizes, color=color, line=dict(width=line_widths, color=line_colors)),
+            name=node_type,
         ))
 
-    st.caption(
-        "🔴 굵은 빨간 테두리 = 질문의 시드 개체(화면 중앙 고정) · 빨간 선/글자 = 답변에 실제로 인용된 근거 · "
-        "회색 = 탐색은 됐지만 최종 답변엔 안 쓰인 삼중항. "
-        "노드를 드래그하거나 휠로 확대/축소할 수 있습니다."
+    fig.update_layout(
+        title=f"노드 {nx_g.number_of_nodes()}개 · 엣지 {nx_g.number_of_edges()}개 · "
+              f"굵은 빨간 테두리=시드 · 빨간 선=답변에 사용된 근거",
+        showlegend=True, height=480, margin=dict(l=10, r=10, t=40, b=10),
+        xaxis=dict(showgrid=False, zeroline=False, visible=False),
+        yaxis=dict(showgrid=False, zeroline=False, visible=False),
     )
-    legend_types = sorted({NAME_TO_TYPE.get(n, "Unknown") for n in node_ids})
-    legend_html = " &nbsp;·&nbsp; ".join(
-        f'<span style="color:{TYPE_COLORS.get(t, TYPE_COLORS["Unknown"])}">●</span> {t}'
-        for t in legend_types
-    )
-    st.markdown(legend_html, unsafe_allow_html=True)
-
-    # width="100%" 를 Config 에 그대로 넘기면 내부에서 f"{width}px" 로 조립돼
-    # "100%px" 라는 무효 CSS 값이 되어 캔버스 크기 계산이 어긋난다(실측: 노드
-    # 하나가 화면을 가득 채우는 버그) - 반드시 숫자(px)로만 넘긴다.
-    config = Config(width=760, height=480, directed=True, physics=True,
-                    hierarchical=False, collapsible=False)
-    config.physics["stabilization"]["iterations"] = 300
-    agraph_with_key(nodes, edges, config, key=key)
+    st.plotly_chart(fig, use_container_width=True, key=key)
 
 
 def render_turn_details(state: dict, key_prefix: str):
