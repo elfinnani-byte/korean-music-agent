@@ -76,12 +76,12 @@
 프로그램(Program), 장르(Genre), 연대(Era). 관계는 18종류로, 크게
 네 갈래다.
 
-| 갈래 | 관계 | 의미 |
-| --- | --- | --- |
-| 소속·구조 | MEMBER_OF, SUBUNIT_OF, SIGNED_TO, FOUNDED, RELEASED, CONTAINS, PERFORMED | 누가 어느 그룹 소속인지, 누가 회사를 세웠는지, 무엇을 냈는지 |
-| 세대를 넘는 연결 | WROTE, PRODUCED, INFLUENCED, COVERED | 누가 곡을 썼는지, 누구를 리메이크·영향받았는지(옛 세대와 요즘 세대를 잇는 핵심 관계) |
-| 협업 | COLLABORATED_WITH | 함께 작업한 관계(교량 관계는 아님) |
-| 속성 | HAS_GENRE, DEBUTED_IN, FORMED_IN, RELEASED_IN, WON, TOPPED_ON | 장르, 데뷔·결성·발매 연대, 수상 여부 |
+| 갈래 | 관계 (무엇을 나타내는지) |
+| --- | --- |
+| 소속·구조 | MEMBER_OF 누가 어느 그룹 소속인지 · SUBUNIT_OF 어느 그룹의 하위 유닛인지 · SIGNED_TO 누가 어느 기획사 소속인지 · FOUNDED 누가 회사를 세웠는지 · RELEASED 누가 어떤 음반을 냈는지 · CONTAINS 그 음반에 어떤 곡이 실렸는지 · PERFORMED 누가 그 곡을 불렀는지 |
+| 세대를 넘는 연결<br>(옛 세대와 요즘 세대를 잇는 핵심 관계) | WROTE 누가 곡을 썼는지 · PRODUCED 누가 프로듀싱했는지 · INFLUENCED 누구에게 영향을 받았는지 · COVERED 누구의 곡을 리메이크했는지 |
+| 협업 | COLLABORATED_WITH 누구와 함께 작업했는지 |
+| 속성 | HAS_GENRE 어떤 장르인지 · DEBUTED_IN/FORMED_IN 몇 년대에 데뷔·결성했는지 · RELEASED_IN 몇 년대에 발매됐는지 · WON 어떤 상을 받았는지 · TOPPED_ON 어느 순위 프로그램에서 1위했는지 |
 
 **2단계, 질문에 답하기(LangGraph 에이전트)**:
 
