@@ -313,7 +313,7 @@ kwarg를 안 주면 `null`을 그대로 vis-network에 넘겨 매 rerun마다
 BM25의 구조적 우위 차이보다 코퍼스 밀도 자체가 성패를 더 크게 좌우했다 —
 더 큰 코퍼스에서 재측정할 가치가 있다.
 
-**제출 직전 최종 코드 리뷰(피어 리뷰 준비)에서 발견한 것**:
+**제출 직전 최종 코드 리뷰에서 발견한 것**:
 
 - **실제로 고친 것**: `llm_factory.get_llm()`이 `config.json`의
   `llm.request_timeout_sec`·`max_retries`를 읽기만 하고 실제
